@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LightGuy : MonoBehaviour {
+public class Nemesis : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
 
@@ -10,14 +10,14 @@ public class LightGuy : MonoBehaviour {
         m_RigidBody = this.rigidbody2D;
         if (m_RigidBody == null)
         {
-            Debug.LogError("No rigidbody 2D attached to lightguy !");
+            Debug.LogError("No rigidbody 2D attached to nemesis !");
         }
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        float axisValue = Input.GetAxis("HorizontalP1");
+        float axisValue = Input.GetAxis("HorizontalP2");
         m_RigidBody.AddForce(new Vector2(axisValue, 0), ForceMode2D.Impulse);
 
 	}
