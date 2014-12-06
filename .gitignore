@@ -2,3 +2,8 @@
 Boucucle/Assets/Standard Assets
 Boucucle/Library
 Boucucle/Temp
+Boucucle/obj
+*.sln
+*.csproj
+*.unityproj
+*.userprefs
