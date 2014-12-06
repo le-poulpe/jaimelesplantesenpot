@@ -8,6 +8,7 @@ public class Nemesis : MonoBehaviour {
     private bool m_CanJump = false;
     private List<GameObject> m_CollidingStuff;
 
+    public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
 

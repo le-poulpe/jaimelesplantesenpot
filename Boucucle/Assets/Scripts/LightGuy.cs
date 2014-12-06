@@ -5,9 +5,10 @@ using System.Collections.Generic;
 public class LightGuy : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
-    private bool        m_CanJump = false;
+    private bool m_CanJump = false;
+    private Nemesis m_AttackingNemesis = null;
     private List<GameObject> m_CollidingStuff;
-    private float            m_Energy;
+    private float m_Energy;
 
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
@@ -32,6 +33,10 @@ public class LightGuy : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D coll)
     {
+        Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
+        if (nemesis != null)
+            m_AttackingNemesis = nemesis;
+
         if (coll.collider.bounds.max.y < this.collider2D.bounds.min.y)
         {
             m_CollidingStuff.Add(coll.gameObject);
@@ -41,6 +46,10 @@ public class LightGuy : MonoBehaviour {
 
     void OnCollisionExit2D(Collision2D coll)
     {
+        Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
+        if (nemesis == m_AttackingNemesis)
+            m_AttackingNemesis = null;
+
         m_CollidingStuff.Remove(coll.gameObject);
         m_CanJump = m_CollidingStuff.Count > 0;
     }
@@ -62,10 +71,14 @@ public class LightGuy : MonoBehaviour {
 
             // update light
             if (m_Light != null)
-                m_Light.range = Mathf.Lerp(m_MinAuraRange, m_MaxAuraRange, m_Energy / m_MaxEnergy);
+                m_Light.intensity = Mathf.Lerp(m_MinAuraRange, m_MaxAuraRange, m_Energy / m_MaxEnergy);
 
             // die slowly
             m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+
+            // die less slowly if in contact with nemesis
+            if (m_AttackingNemesis != null)
+                m_Energy -= m_AttackingNemesis.m_EnergySuckPerSecond * Time.deltaTime;
         }
 	}
 }
