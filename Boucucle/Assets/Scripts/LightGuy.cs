@@ -84,9 +84,10 @@ public class LightGuy : MonoBehaviour {
             }
 
             //Shoot
-            if (Input.GetKeyDown(KeyCode.Joystick1Button1))
+            if (Input.GetKeyDown(KeyCode.Joystick1Button2))
             {
                 // TODO
+                Debug.Log("Piouuu");
             }
 
             //Blast
