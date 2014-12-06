@@ -9,6 +9,9 @@ public class LightGuy : MonoBehaviour {
     private Nemesis m_AttackingNemesis = null;
     private List<GameObject> m_CollidingStuff;
     private float m_Energy;
+    private bool m_IsBlasting = false;
+
+    private GameObject m_Cursor;
 
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
@@ -41,7 +44,10 @@ public class LightGuy : MonoBehaviour {
             Debug.LogError("No blast light 2D attached to lightguy !");
         }
         else
-            m_BlastLight.enabled = false;
+        {
+            m_BlastLight.gameObject.SetActive(false);
+            m_IsBlasting = false;
+        }
 	}
 
     void OnCollisionEnter2D(Collision2D coll)
@@ -93,11 +99,13 @@ public class LightGuy : MonoBehaviour {
             //Blast
             if (Input.GetAxis("BlastP1Joy") < 0) // xbox left trigger
             {
-                m_BlastLight.enabled = true;
+                m_BlastLight.gameObject.SetActive(true);
+                m_IsBlasting = true;
             }
             else
             {
-                m_BlastLight.enabled = false;
+                m_BlastLight.gameObject.SetActive(false);
+                m_IsBlasting = false;
             }
 
 
@@ -113,10 +121,13 @@ public class LightGuy : MonoBehaviour {
                 m_Energy -= m_AttackingNemesis.m_EnergySuckPerSecond * Time.deltaTime;
 
             // die less slowly if blasting
-            if (m_BlastLight.enabled)
+            if (m_IsBlasting)
                 m_Energy -= m_BlastSuckPerSecond * Time.deltaTime;
         }
-        else if (m_BlastLight.enabled)
-            m_BlastLight.enabled = false;
+        else if (m_IsBlasting)
+        {
+            m_BlastLight.gameObject.SetActive(false);
+            m_IsBlasting = false;
+        }
 	}
 }
