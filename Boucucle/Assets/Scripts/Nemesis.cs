@@ -8,7 +8,8 @@ public class Nemesis : MonoBehaviour {
     private bool m_CanJump = false;
     private List<GameObject> m_CollidingStuff;
 
-    public float m_JumpImpulse;
+    public float m_JumpImpulse = 5;
+    public float m_MoveSpeed = 1;
 
 	// Use this for initialization
 	void Start () {
@@ -40,7 +41,7 @@ public class Nemesis : MonoBehaviour {
 	void Update ()
     {
         float axisValue = Input.GetAxis("HorizontalP2Joy");
-        m_RigidBody.AddForce(new Vector2(axisValue, 0), ForceMode2D.Impulse);
+        m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
 
         if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
         {
