@@ -11,7 +11,7 @@ public class LightGuy : MonoBehaviour {
     private float m_Energy;
     private bool m_IsBlasting = false;
 
-    private GameObject m_Cursor;
+    public GameObject m_Cursor;
 
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
@@ -48,6 +48,7 @@ public class LightGuy : MonoBehaviour {
             m_BlastLight.gameObject.SetActive(false);
             m_IsBlasting = false;
         }
+
 	}
 
     void OnCollisionEnter2D(Collision2D coll)
@@ -79,8 +80,16 @@ public class LightGuy : MonoBehaviour {
         if (m_Energy > 0)
         {
             // update controls
-            float axisValue = Input.GetAxis("HorizontalP1Joy");
-            m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
+            float axisValueX = Input.GetAxis("HorizontalP1Joy");
+            float axisValueY = Input.GetAxis("VerticalP1Joy");
+            m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
+
+            if (m_Cursor != null)
+            {
+                float angle = Mathf.Atan2(-axisValueY, axisValueX) * 180/Mathf.PI;
+                Debug.Log("x : " + axisValueX + " y : " + axisValueY + "tan : " + angle);
+                m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+            }
 
             // Jump
             if (Input.GetKeyDown(KeyCode.Joystick1Button0) && m_CanJump)
