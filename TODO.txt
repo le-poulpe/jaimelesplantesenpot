@@ -37,5 +37,9 @@ Elles seraient placées près du fond, projetant de petites ombres et ne touchant 
 
 Merge des materials ++
 
+*******************
 
+Bruits Nemesis :
 
+- bruit de marche (béton-métal)
+- grunt quand peu de santé

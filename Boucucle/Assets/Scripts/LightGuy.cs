@@ -10,6 +10,7 @@ public class LightGuy : MonoBehaviour {
     private List<GameObject> m_CollidingStuff;
     private float m_Energy;
     private bool m_IsBlasting = false;
+    private bool m_IsShooting = false;
 
     public GameObject m_Cursor;
 
@@ -21,6 +22,7 @@ public class LightGuy : MonoBehaviour {
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
+    public GameObject m_Shoot = null;
     public float m_MinAuraIntensity = 0;
     public float m_MaxAuraIntensity = 2;
 
@@ -28,6 +30,7 @@ public class LightGuy : MonoBehaviour {
 	void Start () {
         m_RigidBody = this.rigidbody2D;
         m_CanJump = false;
+        m_IsShooting = false;
         m_CollidingStuff = new List<GameObject>();
         m_Energy = m_MaxEnergy;
 
@@ -47,6 +50,15 @@ public class LightGuy : MonoBehaviour {
         {
             m_BlastLight.gameObject.SetActive(false);
             m_IsBlasting = false;
+        }
+        if (m_Shoot == null)
+        {
+            Debug.LogError("No shoot attached to lightguy !");
+        }
+        else
+        {
+            m_Shoot.gameObject.SetActive(false);
+            m_IsShooting = false;
         }
 
 	}
@@ -82,13 +94,15 @@ public class LightGuy : MonoBehaviour {
             // update controls
             float axisValueX = Input.GetAxis("HorizontalP1Joy");
             float axisValueY = Input.GetAxis("VerticalP1Joy");
+            float angle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
             m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
 
             if (m_Cursor != null)
             {
-                float angle = Mathf.Atan2(-axisValueY, axisValueX) * 180/Mathf.PI;
-                Debug.Log("x : " + axisValueX + " y : " + axisValueY + "tan : " + angle);
-                m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+                if (axisValueX != 0 || axisValueY != 0)
+                {
+                    m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+                }
             }
 
             // Jump
@@ -96,13 +110,6 @@ public class LightGuy : MonoBehaviour {
             {
                 m_CanJump = false;
                 m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
-            }
-
-            //Shoot
-            if (Input.GetKeyDown(KeyCode.Joystick1Button2))
-            {
-                // TODO
-                Debug.Log("Piouuu");
             }
 
             //Blast
@@ -116,6 +123,27 @@ public class LightGuy : MonoBehaviour {
                 m_BlastLight.gameObject.SetActive(false);
                 m_IsBlasting = false;
             }
+
+            //Shoot
+            if (Input.GetKeyDown(KeyCode.Joystick1Button2))
+            {
+                m_Shoot.gameObject.SetActive(true);
+                m_IsShooting = true;
+            }
+            else if (Input.GetKeyUp(KeyCode.Joystick1Button2))
+            {
+                m_Shoot.gameObject.SetActive(false);
+                m_IsShooting = false;
+            }
+
+            if (m_IsShooting)
+            {
+                if (axisValueX != 0 || axisValueY != 0)
+                {
+                    m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+                }
+            }
+
 
 
             // update light
