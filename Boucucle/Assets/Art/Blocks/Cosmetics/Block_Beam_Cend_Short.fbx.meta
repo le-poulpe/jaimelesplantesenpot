@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d8d3dad981eaefa488a4589dc8bd5e54
+guid: a16a19ee940b1b943a3dadd2a058de69
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -7,8 +7,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Block_Beam_C
-    4300002: Block_Beam_Cend
+    4300000: Block_Beam_Cend_Short
     9500000: //RootNode
   materials:
     importMaterials: 0
