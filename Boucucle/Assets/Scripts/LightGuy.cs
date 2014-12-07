@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class LightGuy : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
+    private Collider2D m_Collider;
     private bool m_CanJump = false;
     private Nemesis m_AttackingNemesis = null;
     private List<GameObject> m_CollidingStuff;
@@ -21,6 +22,7 @@ public class LightGuy : MonoBehaviour {
     public float m_EnergyLossPerSecond = 0.1f;
     public float m_BlastSuckPerSecond = 15;
     public float m_ShootSuckPerSecond = 10;
+    public float m_RotationSpeed = 1000f;
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
@@ -31,11 +33,16 @@ public class LightGuy : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         m_RigidBody = this.rigidbody2D;
+        m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
         m_IsShooting = false;
         m_CollidingStuff = new List<GameObject>();
         m_Energy = m_MaxEnergy;
 
+        if (m_Collider == null)
+        {
+            Debug.LogError("No rigidbody 2D attached to lightguy !");
+        }
         if (m_RigidBody == null)
         {
             Debug.LogError("No rigidbody 2D attached to lightguy !");
@@ -71,7 +78,7 @@ public class LightGuy : MonoBehaviour {
         if (nemesis != null)
             m_AttackingNemesis = nemesis;
 
-        if (coll.collider.bounds.max.y < this.collider2D.bounds.min.y)
+        if (coll.collider.bounds.max.y < m_Collider.bounds.min.y)
         {
             m_CollidingStuff.Add(coll.gameObject);
             m_CanJump = true;
@@ -100,6 +107,8 @@ public class LightGuy : MonoBehaviour {
             if (axisValueX != 0 || axisValueY != 0)
             {
                 m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
+                m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
+                
             }
 
             m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
