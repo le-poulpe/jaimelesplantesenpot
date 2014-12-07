@@ -1,1 +1,41 @@
 némésis peut faire des choses que robert ne peut pas ? (s'agripper au bord des murs ?)
+
+
+*******************
+Notes : 
+Blast très court (<0.3-5s)
+Coût +/- 8% du total restant, puissance diminuée avec la perte d'énergie
+Durée de vie Robert Hue +/- 3m, Némésis 2,5m
+1 point d'énergie = 1.8 seconde RH et 1.5s Nem
+
+Objets à récolter ? : 
+- Illumination générale : Illumine pendant 2 secondes l'arène (soigne de ~6 énergie Nem)
+- Piège à photophage (mets un léger halo violet sur Nem pendant 1.5s)
+Objets ont un effet différent suivant celui qui le prend ? Objets très légèrement éclairés ?
+*******************
+
+1 Mur : 25cm 
+1 - Centré droit (180° pour centré gauche
+1 Mur : 100cm
+1 Mur-grille : 25cm         (texture pour différencier avec mur opaque)
+1 - Centré droit (180° pour centré gauche)
+
+1 Sol : 25cm
+1 Sol Grille : 25cm
+1 Escalier ouvert : Adaptatif
+1 Escalier Opaque : Adaptatif
+
+1 Echelle
+
+* Slope
+
+Faire des faux-décors ? Poutrelles verticales de soutien etc ?
+Aucun impact direct sur le gameplay (pas de collision), meuble et donne de ombres légèrement moins lisibles (c'est un choix).
+Elles seraient placées près du fond, projetant de petites ombres et ne touchant pas les modèles mobiles.
+
+*******************
+
+Merge des materials ++
+
+
+

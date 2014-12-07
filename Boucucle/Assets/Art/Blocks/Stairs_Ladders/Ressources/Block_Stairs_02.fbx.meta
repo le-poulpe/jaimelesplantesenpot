@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d2b4314d42358dc4b9e94a8050eda877
+guid: 723011b53695a454c843883a21af3898
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -7,9 +7,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Wall_classic
-    4300002: Wall_Cubic_01
-    4300004: Block_Wall_Cubic_01
+    4300000: Block_Stairs_02
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -46,7 +44,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 1
   importAnimation: 1
   copyAvatar: 0

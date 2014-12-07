@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b1dabc46cc6417744b0e11955859cfdb
+guid: 5530418635cbf964bb93c13dd3ac9819
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -7,9 +7,10 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Stair_003
-    4300002: Stair_01
-    4300004: Block_Stair_01
+    4300000: Cube_064
+    4300002: Ladder_01
+    4300004: Block_Ladder_01
+    4300006: Block_Stairs_02
     9500000: //RootNode
   materials:
     importMaterials: 0
