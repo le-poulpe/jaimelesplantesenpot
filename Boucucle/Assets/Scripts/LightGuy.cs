@@ -7,7 +7,8 @@ public class LightGuy : MonoBehaviour {
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
     private bool m_CanJump = false;
-    private Nemesis m_AttackingNemesis = null;
+    private Nemesis m_Nemesis;
+    private bool m_AttackingNemesis = false;
     private float m_Energy;
     private bool m_IsBlasting = false;
     private bool m_IsShooting = false;
@@ -36,7 +37,12 @@ public class LightGuy : MonoBehaviour {
         m_CanJump = false;
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
+        m_Nemesis = FindObjectOfType<Nemesis>();
 
+        if (m_Nemesis == null)
+        {
+            Debug.LogError("No nemesis in scene !");
+        }
         if (m_Collider == null)
         {
             Debug.LogError("No rigidbody 2D attached to lightguy !");
@@ -74,14 +80,14 @@ public class LightGuy : MonoBehaviour {
     {
         Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
         if (nemesis != null)
-            m_AttackingNemesis = nemesis;
+            m_AttackingNemesis = true;
     }
 
     void OnCollisionExit2D(Collision2D coll)
     {
         Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
-        if (nemesis == m_AttackingNemesis)
-            m_AttackingNemesis = null;
+        if (nemesis != null)
+            m_AttackingNemesis = false;
     }
 	
 	// Update is called once per frame
@@ -143,8 +149,52 @@ public class LightGuy : MonoBehaviour {
                 m_IsShooting = false;
             }
 
+
+            // update light
+            if (m_AuraLight != null)
+                m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
+
+            // die slowly
+            m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+
+            // die less slowly if in contact with nemesis
+            if (m_AttackingNemesis)
+            {
+                float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
+                m_Energy -= loss;
+                m_Nemesis.Heal(loss);
+            }
+
+            // die less slowly if blasting
+            if (m_IsBlasting)
+            {
+                float loss = m_BlastSuckPerSecond * Time.deltaTime;
+                m_Energy -= loss;
+
+                //nemesis sucks light if touched by blast
+                Vector2 dir = m_Nemesis.transform.position - this.transform.position;
+                dir.Normalize();
+                RaycastHit2D[] hits = Physics2D.RaycastAll(this.transform.position, dir);
+                bool nemesisTouched = false;
+                for (int i = 0; i < hits.Length; ++i )
+                {
+                    if (hits[i].collider == m_Collider)
+                        continue;
+
+                    if (hits[i].collider.gameObject.GetComponent<Nemesis>() != null)
+                        nemesisTouched = true;
+                    break;
+                }
+                if (nemesisTouched)
+                    m_Nemesis.Heal(loss * 0.5f);
+            }
+
+            // die less slowly if shooting
             if (m_IsShooting)
             {
+                float loss = m_ShootSuckPerSecond * Time.deltaTime;
+                m_Energy -= loss;
+                
                 if (axisValueX != 0 || axisValueY != 0)
                 {
                     m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
@@ -159,31 +209,11 @@ public class LightGuy : MonoBehaviour {
                         if (nemesis != null)
                         {
                             nemesis.Stun();
+                            nemesis.Heal(loss);
                         }
                     }
                 }
             }
-
-
-
-            // update light
-            if (m_AuraLight != null)
-                m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
-
-            // die slowly
-            m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
-
-            // die less slowly if in contact with nemesis
-            if (m_AttackingNemesis != null)
-                m_Energy -= m_AttackingNemesis.m_EnergySuckPerSecond * Time.deltaTime;
-
-            // die less slowly if blasting
-            if (m_IsBlasting)
-                m_Energy -= m_BlastSuckPerSecond * Time.deltaTime;
-
-            // die less slowly if shooting
-            if (m_IsShooting)
-                m_Energy -= m_ShootSuckPerSecond * Time.deltaTime;
         }
         else if (m_IsBlasting)
         {
