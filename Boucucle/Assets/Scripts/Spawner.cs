@@ -2,8 +2,10 @@
 using System.Collections;
 
 public class Spawner : MonoBehaviour {
-
-	public Vector2[] m_SpawnPoints;
+	
+	public Vector2[] m_LightGuySpawnPoints;
+	public Vector2[] m_NemesisSpawnPoints;
+	public Vector2[] m_PotDeFleurSpawnPoints;
 	public GameObject m_LightGuyPrefab;
 	public GameObject m_NemesisPrefab;
 	public GameObject m_PotDeFleurPrefab;
@@ -11,22 +13,8 @@ public class Spawner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        if (m_SpawnPoints.Length < 3)
-        {
-            Debug.LogError("Need at least 3 spawn points !");
-        }
-
-        // Fisher Yates
-		for (int i = 0; i < m_SpawnPoints.Length; ++i)
-        {
-            int rand = Random.Range(i, m_SpawnPoints.Length);
-            Vector2 temp = m_SpawnPoints[i];
-            m_SpawnPoints[i] = m_SpawnPoints[rand];
-            m_SpawnPoints[rand] = temp;
-        }
-
-        GameObject.Instantiate(m_LightGuyPrefab, m_SpawnPoints[0], Quaternion.identity);
-        GameObject.Instantiate(m_NemesisPrefab, m_SpawnPoints[1], Quaternion.identity);
-        GameObject.Instantiate(m_PotDeFleurPrefab, m_SpawnPoints[2], Quaternion.identity);
+		GameObject.Instantiate(m_LightGuyPrefab, m_LightGuySpawnPoints[Random.Range(0, m_LightGuySpawnPoints.Length)], Quaternion.identity);
+        GameObject.Instantiate(m_NemesisPrefab, m_NemesisSpawnPoints[Random.Range(0, m_NemesisSpawnPoints.Length)], Quaternion.identity);
+        GameObject.Instantiate(m_PotDeFleurPrefab, m_PotDeFleurSpawnPoints[Random.Range(0, m_PotDeFleurSpawnPoints.Length)], Quaternion.identity);
 	}
 }
