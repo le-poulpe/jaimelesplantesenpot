@@ -8,7 +8,6 @@ public class LightGuy : MonoBehaviour {
     private Collider2D m_Collider;
     private bool m_CanJump = false;
     private Nemesis m_AttackingNemesis = null;
-    private List<GameObject> m_CollidingStuff;
     private float m_Energy;
     private bool m_IsBlasting = false;
     private bool m_IsShooting = false;
@@ -36,7 +35,6 @@ public class LightGuy : MonoBehaviour {
         m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
         m_IsShooting = false;
-        m_CollidingStuff = new List<GameObject>();
         m_Energy = m_MaxEnergy;
 
         if (m_Collider == null)
@@ -77,12 +75,6 @@ public class LightGuy : MonoBehaviour {
         Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
         if (nemesis != null)
             m_AttackingNemesis = nemesis;
-
-        if (coll.collider.bounds.max.y < m_Collider.bounds.min.y)
-        {
-            m_CollidingStuff.Add(coll.gameObject);
-            m_CanJump = true;
-        }
     }
 
     void OnCollisionExit2D(Collision2D coll)
@@ -90,14 +82,13 @@ public class LightGuy : MonoBehaviour {
         Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
         if (nemesis == m_AttackingNemesis)
             m_AttackingNemesis = null;
-
-        m_CollidingStuff.Remove(coll.gameObject);
-        m_CanJump = m_CollidingStuff.Count > 0;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+
+        m_CanJump = Physics2D.OverlapCircleAll(m_Collider.transform.position + new Vector3(0, - m_Collider.bounds.extents.y, 0), 0.2f).Length > 1; // will collide at least with self
         if (m_Energy > 0)
         {
             // update controls

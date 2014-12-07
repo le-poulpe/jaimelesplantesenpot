@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public class Nemesis : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
+    private Collider2D m_Collider;
     private bool m_CanJump = false;
-    private List<GameObject> m_CollidingStuff;
     private float m_StunTimer;
     private float m_PlayStepSoundTimer;
     private float m_PlayGruntSoundTimer;
@@ -26,12 +26,11 @@ public class Nemesis : MonoBehaviour {
     public AudioSource m_StepSource;
     public AudioSource m_GruntSource;
 
-
 	// Use this for initialization
 	void Start () {
         m_RigidBody = this.rigidbody2D;
+        m_Collider = this.collider2D;
         m_CanJump = false;
-        m_CollidingStuff = new List<GameObject>();
         if (m_RigidBody == null)
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
@@ -40,27 +39,15 @@ public class Nemesis : MonoBehaviour {
         m_PlayStepSoundTimer = 1;
 		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
         m_Energy = m_MaxEnergy;
-    }
 
-    void OnCollisionEnter2D(Collision2D coll)
-    {
-        if (coll.collider.bounds.max.y < this.collider2D.bounds.min.y)
-        {
-            m_CollidingStuff.Add(coll.gameObject);
-            m_CanJump = true;
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D coll)
-    {
-        m_CollidingStuff.Remove(coll.gameObject);
-        m_CanJump = m_CollidingStuff.Count > 0;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
         m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+
+        m_CanJump = Physics2D.OverlapCircleAll(m_Collider.transform.position + new Vector3(0, -m_Collider.bounds.extents.y, 0), 0.2f).Length > 1; // will collide at least with self
         if (m_Energy > 0)
         {
             if (m_StunTimer > 0)
