@@ -22,7 +22,7 @@ public class LightGuy : MonoBehaviour {
     public float m_EnergyLossPerSecond = 0.1f;
     public float m_BlastSuckPerSecond = 15;
     public float m_ShootSuckPerSecond = 10;
-    public float m_RotationSpeed = 1000f;
+    public float m_RotationSpeed = 400f;
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
@@ -78,14 +78,14 @@ public class LightGuy : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D coll)
     {
-        Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
+        Nemesis nemesis = coll.gameObject.GetComponentInParent<Nemesis>();
         if (nemesis != null)
             m_AttackingNemesis = true;
     }
 
     void OnCollisionExit2D(Collision2D coll)
     {
-        Nemesis nemesis = coll.gameObject.GetComponent<Nemesis>();
+        Nemesis nemesis = coll.gameObject.GetComponentInParent<Nemesis>();
         if (nemesis != null)
             m_AttackingNemesis = false;
     }
@@ -182,7 +182,7 @@ public class LightGuy : MonoBehaviour {
                     if (hits[i].collider == m_Collider)
                         continue;
 
-                    if (hits[i].collider.gameObject.GetComponent<Nemesis>() != null)
+                    if (hits[i].collider.gameObject.GetComponentInParent<Nemesis>() != null)
                         nemesisTouched = true;
                     break;
                 }

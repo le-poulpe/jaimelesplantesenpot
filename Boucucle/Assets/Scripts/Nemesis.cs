@@ -22,6 +22,7 @@ public class Nemesis : MonoBehaviour {
     public float m_MaxEnergy = 83f;
     public float m_EnergyLossPerSecond = 0.1f;
     public float m_StartGruntingEnergy = 30;
+    public float m_RotationSpeed = 400;
 
     public AudioSource m_StepSource;
     public AudioSource m_GruntSource;
@@ -29,7 +30,7 @@ public class Nemesis : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         m_RigidBody = this.rigidbody2D;
-        m_Collider = this.collider2D;
+        m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
         if (m_RigidBody == null)
         {
@@ -55,8 +56,14 @@ public class Nemesis : MonoBehaviour {
                 m_StunTimer -= Time.deltaTime;
             else
             {
-                float axisValue = Input.GetAxis("HorizontalP2Joy");
-                m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
+                // update controls
+                float axisValueX = Input.GetAxis("HorizontalP2Joy");
+
+                if (axisValueX != 0)
+                {
+                    m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
+                    m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
+                }
 
                 // footstep sound
                 if (m_StepSource != null)
@@ -120,5 +127,10 @@ public class Nemesis : MonoBehaviour {
     {
         Debug.Log("heal !");
         m_Energy += energy;
+    }
+
+    public Collider2D GetCollider()
+    {
+        return m_Collider;
     }
 }
