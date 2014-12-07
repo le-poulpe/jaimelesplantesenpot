@@ -9,13 +9,23 @@ public class Nemesis : MonoBehaviour {
     private List<GameObject> m_CollidingStuff;
     private float m_StunTimer;
     private float m_PlayStepSoundTimer;
+    private float m_PlayGruntSoundTimer;
 	private Vector3	m_LastPosition;
+    private float m_Energy;
 
     public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
     public float m_StunTime = 1.0f;
     public float m_StepRate = 1.0f;
+    public float m_GruntRate = 1.0f;
+    public float m_MaxEnergy = 83f;
+    public float m_EnergyLossPerSecond = 0.1f;
+    public float m_StartGruntingEnergy = 30;
+
+    public AudioSource m_StepSource;
+    public AudioSource m_GruntSource;
+
 
 	// Use this for initialization
 	void Start () {
@@ -29,6 +39,7 @@ public class Nemesis : MonoBehaviour {
         m_StunTimer = 0;
         m_PlayStepSoundTimer = 1;
 		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
+        m_Energy = m_MaxEnergy;
     }
 
     void OnCollisionEnter2D(Collision2D coll)
@@ -49,42 +60,76 @@ public class Nemesis : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (m_StunTimer > 0)
-            m_StunTimer -= Time.deltaTime;
-        else
+        m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+        if (m_Energy > 0)
         {
-            float axisValue = Input.GetAxis("HorizontalP2Joy");
-            m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
-
-			Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
-			float velocity = Mathf.Abs((currentPosition.x - m_LastPosition.x) / Time.deltaTime);
-            if (Mathf.Abs(velocity) > 0.1 && m_CanJump)
+            if (m_StunTimer > 0)
+                m_StunTimer -= Time.deltaTime;
+            else
             {
-                if (m_PlayStepSoundTimer > 0)
+                float axisValue = Input.GetAxis("HorizontalP2Joy");
+                m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
+
+                // footstep sound
+                if (m_StepSource != null)
                 {
-                    m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
+                    Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
+			        float velocity = Mathf.Abs((currentPosition.x - m_LastPosition.x) / Time.deltaTime);
+                    if (Mathf.Abs(velocity) > 0.1 && m_CanJump)
+                    {
+                        if (m_PlayStepSoundTimer > 0)
+                        {
+                            m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
+                        }
+                        else
+                        {
+                            m_PlayStepSoundTimer = 1;
+                                m_StepSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+                                m_StepSource.Play();
+                        }
+                    }
                 }
-                else
+             
+
+                if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
                 {
-                    m_PlayStepSoundTimer = 1;
-                    audio.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
-                    audio.Play();
+                    m_CanJump = false;
+                    m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
                 }
             }
-                
 
-            if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
+            if (m_GruntSource != null)
             {
-                m_CanJump = false;
-                m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
+                if (m_Energy < m_StartGruntingEnergy)
+                {
+                    if (m_PlayGruntSoundTimer > 0)
+                    {
+                        float gruntSpeedPerSecond = (m_StartGruntingEnergy - m_Energy) / m_StartGruntingEnergy * m_GruntRate;
+                        if (gruntSpeedPerSecond > 1)
+                            gruntSpeedPerSecond = 1;
+                        m_PlayGruntSoundTimer -= Time.deltaTime * gruntSpeedPerSecond;
+                    }
+                    else
+                    {
+                        m_PlayGruntSoundTimer = 1;
+                        m_GruntSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+                        m_GruntSource.Play();
+                    }
+                }
             }
-        }
-		
-		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
+    
+            m_LastPosition = new Vector2(transform.position.x, transform.position.y);
+
+		}
 	}
 
     public void Stun()
     {
         m_StunTimer = m_StunTime;
+    }
+
+    public void Heal(float energy)
+    {
+        m_Energy += energy;
     }
 }

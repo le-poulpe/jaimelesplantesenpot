@@ -43,3 +43,8 @@ Bruits Nemesis :
 
 - bruit de marche (béton-métal)
 - grunt quand peu de santé
+
+- eclairage du nemesis (3 lampes qui s'allument :) :
+	- rayon
+	- blast
+	- contact
