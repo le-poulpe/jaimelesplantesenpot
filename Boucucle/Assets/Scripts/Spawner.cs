@@ -10,16 +10,15 @@ public class Spawner : MonoBehaviour {
 	public GameObject m_NemesisPrefab;
 	public GameObject m_PotDeFleurPrefab;
 
-	// Use this for initialization
-	void Start () {
-        
+    public void Spawn()
+    {
         Vector2 spawnLight = m_LightGuySpawnPoints[Random.Range(0, m_LightGuySpawnPoints.Length)];
         Vector2 spawnNemesis = m_NemesisSpawnPoints[Random.Range(0, m_NemesisSpawnPoints.Length)];
-        Vector2 spawnPotDeFleur =  m_PotDeFleurSpawnPoints[Random.Range(0, m_PotDeFleurSpawnPoints.Length)];
-        
+        Vector2 spawnPotDeFleur = m_PotDeFleurSpawnPoints[Random.Range(0, m_PotDeFleurSpawnPoints.Length)];
 
-		GameObject.Instantiate(m_LightGuyPrefab, transform.position + new Vector3(spawnLight.x, spawnLight.y), Quaternion.identity);
+
+        GameObject.Instantiate(m_LightGuyPrefab, transform.position + new Vector3(spawnLight.x, spawnLight.y), Quaternion.identity);
         GameObject.Instantiate(m_NemesisPrefab, transform.position + new Vector3(spawnNemesis.x, spawnNemesis.y), Quaternion.identity);
         GameObject.Instantiate(m_PotDeFleurPrefab, transform.position + new Vector3(spawnPotDeFleur.x, spawnPotDeFleur.y), Quaternion.identity);
-	}
+    }
 }

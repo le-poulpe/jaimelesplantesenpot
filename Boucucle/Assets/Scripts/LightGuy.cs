@@ -15,6 +15,8 @@ public class LightGuy : MonoBehaviour {
     private float m_ShootAngle = 0f;
     private bool m_IsOnLadder = false;
 
+    private GameState m_GameState;
+
     public GameObject m_Cursor;
 
     public float m_JumpImpulse = 5;
@@ -40,6 +42,7 @@ public class LightGuy : MonoBehaviour {
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
+        m_GameState = FindObjectOfType<GameState>();
 
         if (m_Nemesis == null)
         {
@@ -83,6 +86,10 @@ public class LightGuy : MonoBehaviour {
         Nemesis nemesis = coll.gameObject.GetComponentInParent<Nemesis>();
         if (nemesis != null)
             m_AttackingNemesis = true;
+        else if (coll.gameObject.GetComponentInParent<PotDeFleur>() != null)
+        {
+            m_GameState.SetGameState(GameState.E_GameState.GM_LIGHT_WIN);
+        }
     }
 
     void OnCollisionExit2D(Collision2D coll)
@@ -270,15 +277,9 @@ public class LightGuy : MonoBehaviour {
                 }
             }
         }
-        else if (m_IsBlasting)
+        else
         {
-            m_BlastLight.gameObject.SetActive(false);
-            m_IsBlasting = false;
-        }
-        else if (m_IsShooting)
-        {
-            m_Shoot.gameObject.SetActive(false);
-            m_IsShooting = false;
+            m_GameState.SetGameState(GameState.E_GameState.GM_NEM_WIN);
         }
 	}
 }
