@@ -48,8 +48,18 @@ public class Nemesis : MonoBehaviour {
     {
         m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
 
-		m_CanJump = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
-		                                     m_Collider.transform.position + new Vector3( 0.2f, -m_Collider.bounds.extents.y + 0.1f, 0)).Length > 1; // will collide at least with self
+        m_CanJump = false;
+        Collider2D[] jumpColliders = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
+                                             m_Collider.transform.position + new Vector3(0.2f, -m_Collider.bounds.extents.y + 0.1f, 0));
+        foreach (Collider2D col in jumpColliders)
+        {
+            if (col != m_Collider && !col.isTrigger)
+            {
+                m_CanJump = true;
+                break;
+            }
+        }
+
 		if (m_Energy > 0)
         {
             if (m_StunTimer > 0)
