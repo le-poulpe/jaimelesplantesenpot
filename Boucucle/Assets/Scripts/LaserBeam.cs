@@ -74,7 +74,6 @@ public class LaserBeam : MonoBehaviour
         //Raycast from the location of the cube forwards
         m_HitObject = null;
         RaycastHit2D[] hit;
-        Debug.Log("raycast origin : " + myTransform.position + "raycast dir : " + myTransform.right);
         hit = Physics2D.RaycastAll(myTransform.position, myTransform.right, maxLength);
         int i = 0;
         while (i < hit.Length)
@@ -85,7 +84,6 @@ public class LaserBeam : MonoBehaviour
                 Vector2 point = new Vector2(hit[i].point.x, hit[i].point.y);
                 point -= new Vector2(myTransform.position.x, myTransform.position.y);
                 length = (int)Mathf.Round(point.magnitude / texLength) + 2;
-				Debug.Log("new length : " + length + "distance : " + hit[i].distance);
                 m_HitObject = hit[i].collider.gameObject;
                 position = new Vector3[length];
                 //Move our End Effect particle system to the hit point and start playing it
@@ -107,7 +105,6 @@ public class LaserBeam : MonoBehaviour
                 endEffect.Stop();
         }
         length = (int)Mathf.Round(maxLength / texLength);
-        Debug.Log("new length : " + length);
         position = new Vector3[length];
         lineRenderer.SetVertexCount(length);
 

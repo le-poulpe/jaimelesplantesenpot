@@ -7,10 +7,12 @@ public class Nemesis : MonoBehaviour {
     private Rigidbody2D m_RigidBody;
     private bool m_CanJump = false;
     private List<GameObject> m_CollidingStuff;
+    private float m_StunTimer;
 
     public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
+    public float m_StunTime = 1.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -21,6 +23,7 @@ public class Nemesis : MonoBehaviour {
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
         }
+        m_StunTimer = 0;
     }
 
     void OnCollisionEnter2D(Collision2D coll)
@@ -41,13 +44,23 @@ public class Nemesis : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        float axisValue = Input.GetAxis("HorizontalP2Joy");
-        m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
-
-        if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
+        if (m_StunTimer > 0)
+            m_StunTimer -= Time.deltaTime;
+        else
         {
-            m_CanJump = false;
-            m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
+            float axisValue = Input.GetAxis("HorizontalP2Joy");
+            m_RigidBody.AddForce(new Vector2(axisValue * m_MoveSpeed, 0), ForceMode2D.Impulse);
+
+            if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
+            {
+                m_CanJump = false;
+                m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
+            }
         }
 	}
+
+    public void Stun()
+    {
+        m_StunTimer = m_StunTime;
+    }
 }

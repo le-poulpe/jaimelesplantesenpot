@@ -11,6 +11,7 @@ public class LightGuy : MonoBehaviour {
     private float m_Energy;
     private bool m_IsBlasting = false;
     private bool m_IsShooting = false;
+    private float m_ShootAngle = 0f;
 
     public GameObject m_Cursor;
 
@@ -19,6 +20,7 @@ public class LightGuy : MonoBehaviour {
     public float m_MaxEnergy = 100;
     public float m_EnergyLossPerSecond = 0.1f;
     public float m_BlastSuckPerSecond = 15;
+    public float m_ShootSuckPerSecond = 10;
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
@@ -94,14 +96,19 @@ public class LightGuy : MonoBehaviour {
             // update controls
             float axisValueX = Input.GetAxis("HorizontalP1Joy");
             float axisValueY = Input.GetAxis("VerticalP1Joy");
-            float angle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
+
+            if (axisValueX != 0 || axisValueY != 0)
+            {
+                m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
+            }
+
             m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
 
             if (m_Cursor != null)
             {
                 if (axisValueX != 0 || axisValueY != 0)
                 {
-                    m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+                    m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
                 }
             }
 
@@ -140,7 +147,20 @@ public class LightGuy : MonoBehaviour {
             {
                 if (axisValueX != 0 || axisValueY != 0)
                 {
-                    m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
+                    m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
+                }
+                LaserBeam beam = m_Shoot.GetComponentInChildren<LaserBeam>();
+                if (beam != null)
+                {
+                    GameObject go = beam.GetHitObject();
+                    if (go != null)
+                    {
+                        Nemesis nemesis = go.GetComponent<Nemesis>();
+                        if (nemesis != null)
+                        {
+                            nemesis.Stun();
+                        }
+                    }
                 }
             }
 
@@ -160,11 +180,20 @@ public class LightGuy : MonoBehaviour {
             // die less slowly if blasting
             if (m_IsBlasting)
                 m_Energy -= m_BlastSuckPerSecond * Time.deltaTime;
+
+            // die less slowly if shooting
+            if (m_IsShooting)
+                m_Energy -= m_ShootSuckPerSecond * Time.deltaTime;
         }
         else if (m_IsBlasting)
         {
             m_BlastLight.gameObject.SetActive(false);
             m_IsBlasting = false;
+        }
+        else if (m_IsShooting)
+        {
+            m_Shoot.gameObject.SetActive(false);
+            m_IsShooting = false;
         }
 	}
 }
