@@ -151,7 +151,6 @@ public class LightGuy : MonoBehaviour {
                 {
                     m_IsOnLadder = false;
                     m_RigidBody.isKinematic = false;
-                    m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
                 }
                 else
                 {
