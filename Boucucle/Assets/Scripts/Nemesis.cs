@@ -125,7 +125,6 @@ public class Nemesis : MonoBehaviour {
 
     public void Heal(float energy)
     {
-        Debug.Log("heal !");
         m_Energy += energy;
     }
 
