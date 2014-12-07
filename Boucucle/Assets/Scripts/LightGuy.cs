@@ -206,7 +206,7 @@ public class LightGuy : MonoBehaviour {
                     GameObject go = beam.GetHitObject();
                     if (go != null)
                     {
-                        Nemesis nemesis = go.GetComponent<Nemesis>();
+                        Nemesis nemesis = go.GetComponentInParent<Nemesis>();
                         if (nemesis != null)
                         {
                             nemesis.Stun();
