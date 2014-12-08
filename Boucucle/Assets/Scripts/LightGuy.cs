@@ -100,7 +100,7 @@ public class LightGuy : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
     {
 
         m_CanJump = false;

@@ -1,12 +1,12 @@
 némésis peut faire des choses que robert ne peut pas ? (s'agripper au bord des murs ?)
 
+*******************
+
+Possibilité pour némésis de révéler sa position (faible lumière violette) ? 10% d'énergie à chaque fois
 
 *******************
 Notes : 
-Blast très court (<0.3-5s)
-Coût +/- 8% du total restant, puissance diminuée avec la perte d'énergie
-Durée de vie Robert Hue +/- 3m, Némésis 2,5m
-1 point d'énergie = 1.8 seconde RH et 1.5s Nem
+Blast très court (<0.3-5s)   ++++
 
 Objets à récolter ? : 
 - Illumination générale : Illumine pendant 2 secondes l'arène (soigne de ~6 énergie Nem)
@@ -29,10 +29,6 @@ Objets ont un effet différent suivant celui qui le prend ? Objets très légèremen
 
 * Slope
 
-Faire des faux-décors ? Poutrelles verticales de soutien etc ?
-Aucun impact direct sur le gameplay (pas de collision), meuble et donne de ombres légèrement moins lisibles (c'est un choix).
-Elles seraient placées près du fond, projetant de petites ombres et ne touchant pas les modèles mobiles.
-
 *******************
 
 Merge des materials ++
@@ -48,3 +44,53 @@ Bruits Nemesis :
 	- rayon
 	- blast
 	- contact
+
+
+	*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*
+
+	Problèmes : 
+F : Feature
+C : A corriger (bug ou soucis de design)
+
+0-C 	Curseur trop éloigné de lightguy, devrait toucher la boule de lumière
+
+1-C 	Beam a le même problème, devrait venir de l'intérieur de la boule. De plus la portée  	 		est limitée, je l'aurai bien vu traverser tout la map pourvu qu'il ne rencontre pas 
+		d'obstacle
+
+0-F 	Blast doit stun pour 0.1s le Dark Guy. Radius d'effet de 1. Effet reste actif tant 
+		qu'exposé au blast, durée de l'effet indépendante du temps d'exposition.
+
+0-F 	Némésis fait un son quand il est touché par de la lumière (blast ou beam) et un autre 			quand il draine lightguy
+		Produit également une lumière violette (spotlight qui éclaire le mur du fond, variable de puissance et angle(radius) en public). Une seule light avec des paramètres à régler indépendamment.
+
+0-F 	Némésis fait un son (différent) quand il draine light guy (+ spotlight, voir précédent)
+
+0-F		Système à l'image du spawner pour lire aléatoirement entre plusieurs musiques en jeu. 
+		Musique s'arrête en fondu (paramétrable) à la fin de la partie.
+
+0-F 	Némésis fait un bruit différent selon qu'il marche sur métal (décors trans) ou béton 
+		(opaque)
+
+0-C 	Les déplacements (vitesse) ainsi que la montée des escaliers se dégradent à mesure que 
+		les fps baissent.
+
+0-F 	Beam soigne Némésis de 12/s
+
+0-F 	Blast soigne Némésis dans un radius de 2 à hauteur de 10/s max et 5/s min suivant la 
+		distance (linéaire).
+
+0-F 	Beam a un son (continu tant qu'utilisé)
+
+0-F 	Blast a un son (continu tant qu'utilisé)
+
+0-F		Son quand Light Guy gagne.
+
+0-F		Son quand Dark Guy gagne.
+
+0-F		Némésis peut (gachette droite) sacrifier 5 énergie pour traverser un élément de décor 
+		métallique (sol-grille ou mur-fenêtre). Durée de l'effet 1.5s terminé immédiatement après un traversement. Ce faisant il allume sa spotlight selon des paramètres spécifique à cette action. -?AUgmentation de la hauteur de saut également?-
+
+0-F		Commandes paramétrables
+	
+
+

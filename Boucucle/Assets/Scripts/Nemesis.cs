@@ -46,7 +46,7 @@ public class Nemesis : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
     {
         m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
 
