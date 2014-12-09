@@ -12,30 +12,23 @@ public class Nemesis : MonoBehaviour {
     private float m_PlayGruntSoundTimer;
 	private Vector3	m_LastPosition;
     private float m_Energy;
-    private bool m_IsRushing = false;
     private bool m_IsOnLadder = false;
 
     public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
-    public float m_MoveSpeedPostRush = 1;   
-    public float m_RushSpeed = 1;   //Vitesse augmentée en rush
     public float m_StunTime = 1.0f;
     public float m_StepRate = 1.0f;
     public float m_GruntRate = 1.0f;
     public float m_MaxEnergy = 83f;
     public float m_EnergyLossPerSecond = 0.1f;
-    public float m_RushSuckPerSecond = 15;  //Coût du rush
     public float m_StartGruntingEnergy = 30;
     public float m_RotationSpeed = 400;
     public float m_LadderClimbSpeed = 1;
     public float m_MeshRotateSpeed1 = 1;
     public float m_MeshRotateSpeed2 = 1;
-    public float m_MeshRotateSpeed3 = 1;
-    public Light m_RushLight = null;
     public GameObject m_MeshRotate1;
     public GameObject m_MeshRotate2;
-    public GameObject m_MeshRotate3;
     private GameState m_GameState;
 
     public AudioSource m_StepSource;
@@ -50,21 +43,11 @@ public class Nemesis : MonoBehaviour {
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
         }
-        if (m_RushLight == null)
-        {
-            Debug.LogError("No rush light 2D attached to lightguy !");
-        }
-        else
-        {
-            m_RushLight.gameObject.SetActive(false);
-            m_IsRushing = false;
-            
         m_StunTimer = 0;
         m_PlayStepSoundTimer = 1;
 		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
         m_Energy = m_MaxEnergy;
         m_GameState = FindObjectOfType<GameState>();
-        }
 
     }
 	
@@ -87,8 +70,7 @@ public class Nemesis : MonoBehaviour {
 
         m_MeshRotate1.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1));
         m_MeshRotate2.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2));
-        m_MeshRotate3.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed3));
-        
+
 		if (m_Energy > 0)
         {
             if (m_StunTimer > 0)
@@ -98,33 +80,6 @@ public class Nemesis : MonoBehaviour {
                 // update controls
                 float axisValueX = Input.GetAxis("HorizontalP2Joy");
                 float axisValueY = Input.GetAxis("VerticalP2Joy");
-                
-                //Rush
-                if (Input.GetAxis("BlastP2Joy") < 0) // xbox left trigger
-                {
-                    m_RushLight.gameObject.SetActive(true);
-                    m_IsRushing = true;
-                }
-                
-                else
-                {
-                    m_RushLight.gameObject.SetActive(false);
-                    m_IsRushing = false;
-                }                
-                
-                if (m_IsRushing)
-                {
-                    float loss = m_RushSuckPerSecond * Time.deltaTime;
-                    m_Energy -= loss;
-                    m_MoveSpeed = m_RushSpeed;
-                }
-                
-                else
-                {
-                    m_RushLight.gameObject.SetActive(false);
-                    m_IsRushing = false;
-                    m_MoveSpeed = m_MoveSpeedPostRush;
-                }
 
                 // check ladder
                 bool collidesLadder = false;
