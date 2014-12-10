@@ -1,12 +1,7 @@
 némésis peut faire des choses que robert ne peut pas ? (s'agripper au bord des murs ?)
 
-*******************
-
-Possibilité pour némésis de révéler sa position (faible lumière violette) ? 10% d'énergie à chaque fois
 
 *******************
-Notes : 
-Blast très court (<0.3-5s)   ++++
 
 Objets à récolter ? : 
 - Illumination générale : Illumine pendant 2 secondes l'arène (soigne de ~6 énergie Nem)
@@ -31,14 +26,9 @@ Objets ont un effet différent suivant celui qui le prend ? Objets très légèremen
 
 *******************
 
-Merge des materials ++
-
-*******************
-
 Bruits Nemesis :
 
 - bruit de marche (béton-métal)
-- grunt quand peu de santé
 
 - eclairage du nemesis (3 lampes qui s'allument :) :
 	- rayon
@@ -47,6 +37,17 @@ Bruits Nemesis :
 
 
 	*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*
+Erreurs diverses (17) dans le script LightGuy.cs, quelques exemples : 
+
+Assets/Scripts/LightGuy.cs(86,43): error CS1061: Type `UnityEngine.GameObject' does not contain a definition for `GetComponentInParent' and no extension method `GetComponentInParent' of type `UnityEngine.GameObject' could be found (are you missing a using directive or an assembly reference?)
+
+Assets/Scripts/LightGuy.cs(107,126): error CS1061: Type `UnityEngine.Collider2D' does not contain a definition for `bounds' and no extension method `bounds' of type `UnityEngine.Collider2D' could be found (are you missing a using directive or an assembly reference?)
+
+Assets/Scripts/LightGuy.cs(107,153): error CS1503: Argument `#2' cannot convert `object' expression to type `float'
+Assets/Scripts/LightGuy.cs(108,136): error CS1502: The best overloaded method match for `UnityEngine.Vector3.Vector3(float, float, float)' has some invalid arguments
+
+Assets/Scripts/LightGuy.cs(176,80): error CS0103: The name `ForceMode2D' does not exist in the current context
+
 
 	Problèmes : 
 F : Feature
