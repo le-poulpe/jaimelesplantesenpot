@@ -154,7 +154,7 @@ public class LightGuy : MonoBehaviour {
             if (m_IsOnLadder)
             {
                 // Jump
-                if (Input.GetKeyDown(KeyCode.Joystick1Button0))
+                if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space"))
                 {
                     m_IsOnLadder = false;
                     m_RigidBody.isKinematic = false;
@@ -184,7 +184,7 @@ public class LightGuy : MonoBehaviour {
                 }
 
                 // Jump
-                if (Input.GetKeyDown(KeyCode.Joystick1Button0) && m_CanJump)
+                if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space") && m_CanJump)
                 {
                     m_CanJump = false;
                     m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
@@ -203,12 +203,12 @@ public class LightGuy : MonoBehaviour {
                 }
 
                 //Shoot
-                if (Input.GetKeyDown(KeyCode.Joystick1Button2))
+                if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
                 {
                     m_Shoot.gameObject.SetActive(true);
                     m_IsShooting = true;
                 }
-                else if (Input.GetKeyUp(KeyCode.Joystick1Button2))
+                else if (Input.GetKeyUp(KeyCode.Joystick1Button2) || Input.GetKeyUp("left shift"))
                 {
                     m_Shoot.gameObject.SetActive(false);
                     m_IsShooting = false;
@@ -227,7 +227,7 @@ public class LightGuy : MonoBehaviour {
                 {
                     float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
                     m_Energy -= loss;
-                    m_Nemesis.Heal(loss);
+                    m_Nemesis.Heal(loss);	
                 }
 
                 // die less slowly if blasting

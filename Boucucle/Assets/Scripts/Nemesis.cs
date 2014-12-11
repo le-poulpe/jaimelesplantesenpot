@@ -7,6 +7,7 @@ public class Nemesis : MonoBehaviour {
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
     private bool m_CanJump = false;
+	private LightGuy m_LightGuy;
     private float m_StunTimer;
     private float m_PlayStepSoundTimer;
     private float m_PlayGruntSoundTimer;
@@ -32,10 +33,13 @@ public class Nemesis : MonoBehaviour {
     public float m_MeshRotateSpeed1 = 1;
     public float m_MeshRotateSpeed2 = 1;
     public float m_MeshRotateSpeed3 = 1;
+	public float m_MeshRotateSpeed4	= 1;
     public Light m_RushLight = null;
+	public GameObject m_DrainingLight = null;
     public GameObject m_MeshRotate1;
     public GameObject m_MeshRotate2;
     public GameObject m_MeshRotate3;
+    public GameObject m_MeshRotate4;
     private GameState m_GameState;
 
     public AudioSource m_StepSource;
@@ -46,6 +50,7 @@ public class Nemesis : MonoBehaviour {
         m_RigidBody = this.rigidbody2D;
         m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
+		m_LightGuy = FindObjectOfType<LightGuy>();
         if (m_RigidBody == null)
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
@@ -54,9 +59,14 @@ public class Nemesis : MonoBehaviour {
         {
             Debug.LogError("No rush light 2D attached to lightguy !");
         }
+        if (m_DrainingLight == null)
+        {
+            Debug.LogError("No draining light 2D attached to lightguy !");
+        }		
         else
         {
             m_RushLight.gameObject.SetActive(false);
+            m_DrainingLight.gameObject.SetActive(false);			
             m_IsRushing = false;
             
         m_StunTimer = 0;
@@ -66,6 +76,20 @@ public class Nemesis : MonoBehaviour {
         m_GameState = FindObjectOfType<GameState>();
         }
 
+    }
+	
+	void OnCollisionEnter2D(Collision2D coll)
+    {
+        LightGuy lightGuy = coll.gameObject.GetComponentInParent<LightGuy>();
+        if (lightGuy != null)
+            m_DrainingLight.gameObject.SetActive(true);
+    }
+	
+    void OnCollisionExit2D(Collision2D coll)
+    {
+        LightGuy lightGuy = coll.gameObject.GetComponentInParent<LightGuy>();
+        if (lightGuy != null)
+            m_DrainingLight.gameObject.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -87,7 +111,8 @@ public class Nemesis : MonoBehaviour {
 
         m_MeshRotate1.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1));
         m_MeshRotate2.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2));
-        m_MeshRotate3.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed3));
+        m_MeshRotate3.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3));
+		m_MeshRotate4.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4));
         
 		if (m_Energy > 0)
         {
@@ -160,7 +185,7 @@ public class Nemesis : MonoBehaviour {
                 if (m_IsOnLadder)
                 {
                     // Jump
-                    if (Input.GetKeyDown(KeyCode.Joystick2Button0))
+                    if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down"))
                     {
                         m_IsOnLadder = false;
                         m_RigidBody.isKinematic = false;
@@ -201,7 +226,7 @@ public class Nemesis : MonoBehaviour {
                     }
 
 
-                    if (Input.GetKeyDown(KeyCode.Joystick2Button0) && m_CanJump)
+                    if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down") && m_CanJump)
                     {
                         m_CanJump = false;
                         m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
