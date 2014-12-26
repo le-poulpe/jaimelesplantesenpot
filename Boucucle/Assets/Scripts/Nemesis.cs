@@ -34,12 +34,15 @@ public class Nemesis : MonoBehaviour {
     public float m_MeshRotateSpeed3 = 1;
 	public float m_MeshRotateSpeed4	= 1;
 	public bool m_Flying = true;
+	public float m_MeshRotateSpeed5	= 1;
     public Light m_RushLight = null;
 	public GameObject m_DrainingLight = null;
+	public GameObject m_StunLight = null;
     public GameObject m_MeshRotate1;
     public GameObject m_MeshRotate2;
     public GameObject m_MeshRotate3;
     public GameObject m_MeshRotate4;
+	public GameObject m_MeshRotate5;
     private GameState m_GameState;
 
     public AudioSource m_StepSource;
@@ -66,7 +69,11 @@ public class Nemesis : MonoBehaviour {
         if (m_DrainingLight == null)
         {
             Debug.LogError("No draining light 2D attached to lightguy !");
-        }		
+        }
+		if (m_StunLight == null)
+        {
+            Debug.LogError("No stun light 2D attached to lightguy !");
+        }
         else
         {
             m_RushLight.gameObject.SetActive(false);
@@ -120,14 +127,20 @@ public class Nemesis : MonoBehaviour {
         m_MeshRotate2.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2));
         m_MeshRotate3.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3));
 		m_MeshRotate4.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4));
+		m_MeshRotate5.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed5, Time.deltaTime * m_MeshRotateSpeed5, Time.deltaTime * m_MeshRotateSpeed5));
         
 		if (m_Energy > 0)
-        {
+        {	
+			LightGuy lightGuy = gameObject.GetComponentInParent<LightGuy>();
             if (m_StunTimer > 0)
+			{
+				m_StunLight.gameObject.SetActive(true);
                 m_StunTimer -= Time.deltaTime;
+			}
             else
             {
-                // update controls
+                m_StunLight.gameObject.SetActive(false);
+				// update controls
                 float axisValueX = Input.GetAxis("HorizontalP2Joy");
                 float axisValueY = Input.GetAxis("VerticalP2Joy");
                 
@@ -303,6 +316,11 @@ public class Nemesis : MonoBehaviour {
     public void Stun()
     {
         m_StunTimer = m_StunTime;
+    }
+	
+	public void StunByBlast()
+    {
+        m_StunTimer = m_StunTime / 8;
     }
 
     public void Heal(float energy)

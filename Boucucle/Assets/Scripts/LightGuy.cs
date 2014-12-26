@@ -8,7 +8,6 @@ public class LightGuy : MonoBehaviour {
     private Collider2D m_Collider;
     private bool m_CanJump = false;
     private Nemesis m_Nemesis;
-    private bool m_AttackingNemesis = false;
     private float m_Energy;
     private bool m_IsBlasting = false;
     private bool m_IsShooting = false;
@@ -18,12 +17,14 @@ public class LightGuy : MonoBehaviour {
     private GameState m_GameState;
 
     public GameObject m_Cursor;
+	private bool m_AttackingNemesis = false;
 
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
     public float m_MaxEnergy = 100;
     public float m_EnergyLossPerSecond = 0.1f;
     public float m_BlastSuckPerSecond = 15;
+	public float m_BlastStunRange = 3.0f;
     public float m_ShootSuckPerSecond = 10;
     public float m_RotationSpeed = 400f;
     public float m_LadderClimbSpeed = 1;
@@ -246,17 +247,22 @@ public class LightGuy : MonoBehaviour {
                     dir.Normalize();
                     RaycastHit2D[] hits = Physics2D.RaycastAll(this.transform.position, dir);
                     bool nemesisTouched = false;
-                    for (int i = 0; i < hits.Length; ++i )
+                    for (int i = 0; i < hits.Length; ++i)
                     {
                         if (hits[i].collider == m_Collider)
                             continue;
-
+							
+						if (hits[i].collider)
+					
                         if (hits[i].collider.gameObject.GetComponentInParent<Nemesis>() != null)
-                            nemesisTouched = true;
+							{
+								nemesisTouched = true;
+							}
                         break;
                     }
-                    if (nemesisTouched)
+                    /*if (nemesisTouched)
                         m_Nemesis.Heal(loss * 0.5f);
+						m_Nemesis.StunByBlast();*/
                 }
 
                 // die less slowly if shooting
@@ -275,7 +281,7 @@ public class LightGuy : MonoBehaviour {
                             if (nemesis != null)
                             {
                                 nemesis.Stun();
-                                nemesis.Heal(loss);
+                                nemesis.Heal(loss);													
                             }
                         }
                     }
