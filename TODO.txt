@@ -1,3 +1,21 @@
+Brainstorm tard le soir :
+
+problèmes actuels :
+- controle du dark guy
+- Light guy ne prend aucune décision intéressante, c'est un robot
+- le système d'énergie du dark guy ne fonctionne pas. On le vire ou feedbacks additionnels ?
+- peu de tension dans les affrontements (trop brefs)
+
+idées:
+- Dark Guy pourrait voler pour régler le problème de contrôle
+- On pourrait avoir 3 pots de fleur au lieu d'un pour éviter les injustices et homogénéiser le temps des parties
+- si on montre les objectifs très brièvement en début de partie, ça permettrait au light guy de s'organiser, donc de prendre des décisions intéressantes affectant le déroulement de la partie. Et pareil pour le dark guy => mindgame.
+- le light guy pourrait avoir une arme ultime mais utilisable une seule fois (gourmande en vie ?), genre une bande de lumière qui balaie la carte et qui tue le dark guy s'il est dedans.
+- on pourrait avoir un système de points, avec un first to ten ou équivalent : quand light guy trouve un pot de fleur, il gagne un point, tandis que dark guy gagne deux points quand il tue Light Guy.
+- vie du dark guy : on pourrait virer le système de vie du dark guy, et juste le rendre beaucoup plus visible quand il rush. Si révéler sa position est très dangereux pour lui, ça reste intéressant.
+
+*******************
+
 némésis peut faire des choses que robert ne peut pas ? (s'agripper au bord des murs ?)
 
 
@@ -37,17 +55,6 @@ Bruits Nemesis :
 
 
 	*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*
-Erreurs diverses (17) dans le script LightGuy.cs, quelques exemples : 
-
-Assets/Scripts/LightGuy.cs(86,43): error CS1061: Type `UnityEngine.GameObject' does not contain a definition for `GetComponentInParent' and no extension method `GetComponentInParent' of type `UnityEngine.GameObject' could be found (are you missing a using directive or an assembly reference?)
-
-Assets/Scripts/LightGuy.cs(107,126): error CS1061: Type `UnityEngine.Collider2D' does not contain a definition for `bounds' and no extension method `bounds' of type `UnityEngine.Collider2D' could be found (are you missing a using directive or an assembly reference?)
-
-Assets/Scripts/LightGuy.cs(107,153): error CS1503: Argument `#2' cannot convert `object' expression to type `float'
-Assets/Scripts/LightGuy.cs(108,136): error CS1502: The best overloaded method match for `UnityEngine.Vector3.Vector3(float, float, float)' has some invalid arguments
-
-Assets/Scripts/LightGuy.cs(176,80): error CS0103: The name `ForceMode2D' does not exist in the current context
-
 
 	Problèmes : 
 F : Feature
@@ -61,10 +68,10 @@ C : A corriger (bug ou soucis de design)
 0-F 	Blast doit stun pour 0.1s le Dark Guy. Radius d'effet de 1. Effet reste actif tant 
 		qu'exposé au blast, durée de l'effet indépendante du temps d'exposition.
 
-0-F 	Némésis fait un son quand il est touché par de la lumière (blast ou beam) et un autre quand il draine lightguy
-		Produit également une lumière violette (spotlight qui éclaire le mur du fond, variable de puissance et angle(radius) en public). Une seule light avec des paramètres à régler indépendamment.
+0.5-F 	Némésis fait un son quand il est touché par de la lumière (blast ou beam)
+	Produit également une lumière violette (spotlight qui éclaire le mur du fond, variable de puissance et angle(radius) en public). Une seule light avec des paramètres à régler indépendamment.
 
-0-F 	Némésis fait un son (différent) quand il draine light guy (+ spotlight, voir précédent)
+1-F 	Némésis fait un son (différent) quand il draine light guy (+ spotlight, voir précédent)
 
 0-F		Système à l'image du spawner pour lire aléatoirement entre plusieurs musiques en jeu. 
 		Musique s'arrête en fondu (paramétrable) à la fin de la partie.
@@ -72,24 +79,25 @@ C : A corriger (bug ou soucis de design)
 0-F 	Némésis fait un bruit différent selon qu'il marche sur métal (décors trans) ou béton(opaque)
 
 1-C 	Les déplacements (vitesse) ainsi que la montée des escaliers se dégradent à mesure que les fps baissent.
-   0-C  Bug du saut dans les marches.
-0-F 	Beam soigne Némésis de 12/s
+   0-C  Bug du saut délirant.
 
-0-F 	Blast soigne Némésis dans un radius de 2 à hauteur de 10/s max et 5/s min suivant la distance (linéaire).
+1-F 	Beam soigne Némésis de 12/s
 
-0-F 	Beam a un son (continu tant qu'utilisé)
+0.5-F 	Blast soigne Némésis dans un radius de 2 à hauteur de 10/s max et 5/s min suivant la distance (linéaire).
+
+1-F 	Beam a un son (continu tant qu'utilisé)
 
 0-F 	Blast a un son (continu tant qu'utilisé)
 
-0-F		Son quand Light Guy gagne.
+0-F	Son quand Light Guy gagne.
 
-0-F		Son quand Dark Guy gagne.
+0-F	Son quand Dark Guy gagne.
 
-0-F		Némésis peut (gachette droite) sacrifier 5 énergie pour traverser un élément de décor métallique (sol-grille ou mur-fenêtre). Durée de l'effet 1.5s terminé immédiatement après un traversement. Ce faisant il allume sa spotlight selon des paramètres spécifique à cette action. -?AUgmentation de la hauteur de saut également?-
+0.5-F	Némésis peut (gachette droite) sacrifier 5 énergie pour traverser un élément de décor métallique (sol-grille ou mur-fenêtre). Durée de l'effet 1.5s terminé immédiatement après un traversement. Ce faisant il allume sa spotlight selon des paramètres spécifique à cette action. -?AUgmentation de la hauteur de saut également?-
 
-0-F		Commandes paramétrables
+0.5-F	Commandes paramétrables
 
 0-F     Rotation des meshs du DG en fonction de ses déplacements. Rotation dans le sens de la marche, continue ainsi tant qu'aucune nouvelle direction n'est prise.
+
+0-C 	Le beam, s'il touche une fois, considère un hit lorsque c'est faux sur le tir suivant (uniquement le suivant)
 	
-
-
