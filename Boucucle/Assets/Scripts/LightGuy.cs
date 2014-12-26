@@ -34,6 +34,11 @@ public class LightGuy : MonoBehaviour {
     public float m_MinAuraIntensity = 0;
     public float m_MaxAuraIntensity = 2;
 
+	public bool IsDead()
+	{
+		return m_Energy <= 0;
+	}
+
 	// Use this for initialization
 	void Start () {
         m_RigidBody = this.rigidbody2D;
@@ -88,7 +93,7 @@ public class LightGuy : MonoBehaviour {
             m_AttackingNemesis = true;
         else if (coll.gameObject.GetComponentInParent<PotDeFleur>() != null)
         {
-            m_GameState.SetGameState(GameState.E_GameState.GM_LIGHT_WIN);
+			Object.Destroy(coll.gameObject);
         }
     }
 
@@ -276,10 +281,6 @@ public class LightGuy : MonoBehaviour {
                     }
                 }
             }
-        }
-        else
-        {
-            m_GameState.SetGameState(GameState.E_GameState.GM_NEM_WIN);
         }
 	}
 }

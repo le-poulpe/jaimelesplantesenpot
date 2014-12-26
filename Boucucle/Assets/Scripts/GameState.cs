@@ -12,8 +12,8 @@ public class GameState : MonoBehaviour {
     };
 
     static bool m_Once = false;
-    LightGuy[] m_LightGuys;
-    Nemesis[] m_Nemesis;
+    LightGuy m_LightGuy;
+    Nemesis m_Nemesis;
     Spawner m_Spawner;
     E_GameState m_GameState;
     public GameObject m_TitleScreen;
@@ -33,7 +33,7 @@ public class GameState : MonoBehaviour {
             SetGameState(E_GameState.GM_PLAY);
 	}
 	
-    public void SetGameState(E_GameState state)
+    void SetGameState(E_GameState state)
     {
         m_GameState = state;
         switch (m_GameState)
@@ -50,26 +50,22 @@ public class GameState : MonoBehaviour {
                 m_DarkScreen.SetActive(false);
 				m_MenuMusic.SetActive(false);
                 m_Spawner.Spawn();
-                m_LightGuys = FindObjectsOfType<LightGuy>();
-                m_Nemesis = FindObjectsOfType<Nemesis>();
+                m_LightGuy = FindObjectOfType<LightGuy>();
+                m_Nemesis = FindObjectOfType<Nemesis>();
                 break;
             case E_GameState.GM_LIGHT_WIN:
                 m_TitleScreen.SetActive(false);
                 m_LightScreen.SetActive(true);
                 m_DarkScreen.SetActive(false);
-                foreach (LightGuy guy in m_LightGuys)
-                    guy.enabled = false;
-                foreach (Nemesis nem in m_Nemesis)
-                    nem.enabled = false;
+	            m_LightGuy.enabled = false;
+	            m_Nemesis.enabled = false;
                 break;
             case E_GameState.GM_NEM_WIN:
                 m_TitleScreen.SetActive(false);
                 m_LightScreen.SetActive(false);
-                m_DarkScreen.SetActive(true);
-                foreach (LightGuy guy in m_LightGuys)
-                    guy.enabled = false;
-                foreach (Nemesis nem in m_Nemesis)
-                    nem.enabled = false;
+				m_DarkScreen.SetActive(true);
+				m_LightGuy.enabled = false;
+				m_Nemesis.enabled = false;
                 break;
         }
     }
@@ -82,6 +78,18 @@ public class GameState : MonoBehaviour {
                 if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("space"))
                     SetGameState(E_GameState.GM_PLAY);
                 break;
+			case E_GameState.GM_PLAY:
+				if (m_LightGuy.IsDead())
+					SetGameState(E_GameState.GM_NEM_WIN);
+				else if (m_Nemesis.IsDead())
+					SetGameState(E_GameState.GM_LIGHT_WIN);
+				else
+				{
+					PotDeFleur[] potsdeFleur = FindObjectsOfType<PotDeFleur>();
+					if (potsdeFleur.Length == 0)				
+						SetGameState(E_GameState.GM_LIGHT_WIN);
+				}
+				break;
             case E_GameState.GM_LIGHT_WIN:
             case E_GameState.GM_NEM_WIN:
                 if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("space"))

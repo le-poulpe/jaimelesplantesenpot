@@ -44,6 +44,11 @@ public class Nemesis : MonoBehaviour {
 
     public AudioSource m_StepSource;
     public AudioSource m_GruntSource;
+	
+	public bool IsDead()
+	{
+		return m_Energy <= 0;
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -293,10 +298,6 @@ public class Nemesis : MonoBehaviour {
             m_LastPosition = new Vector2(transform.position.x, transform.position.y);
 
 		}
-        else
-        {
-            m_GameState.SetGameState(GameState.E_GameState.GM_LIGHT_WIN);
-        }
 	}
 
     public void Stun()
