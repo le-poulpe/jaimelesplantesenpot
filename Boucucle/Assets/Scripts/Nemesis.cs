@@ -7,7 +7,6 @@ public class Nemesis : MonoBehaviour {
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
     private bool m_CanJump = false;
-	private LightGuy m_LightGuy;
     private float m_StunTimer;
     private float m_PlayStepSoundTimer;
     private float m_PlayGruntSoundTimer;
@@ -34,6 +33,7 @@ public class Nemesis : MonoBehaviour {
     public float m_MeshRotateSpeed2 = 1;
     public float m_MeshRotateSpeed3 = 1;
 	public float m_MeshRotateSpeed4	= 1;
+	public bool m_Flying = true;
     public Light m_RushLight = null;
 	public GameObject m_DrainingLight = null;
     public GameObject m_MeshRotate1;
@@ -50,7 +50,6 @@ public class Nemesis : MonoBehaviour {
         m_RigidBody = this.rigidbody2D;
         m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
-		m_LightGuy = FindObjectOfType<LightGuy>();
         if (m_RigidBody == null)
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
@@ -69,12 +68,15 @@ public class Nemesis : MonoBehaviour {
             m_DrainingLight.gameObject.SetActive(false);			
             m_IsRushing = false;
             
-        m_StunTimer = 0;
-        m_PlayStepSoundTimer = 1;
-		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
-        m_Energy = m_MaxEnergy;
-        m_GameState = FindObjectOfType<GameState>();
+	        m_StunTimer = 0;
+	        m_PlayStepSoundTimer = 1;
+			m_LastPosition = new Vector2(transform.position.x, transform.position.y);
+	        m_Energy = m_MaxEnergy;
+	        m_GameState = FindObjectOfType<GameState>();
         }
+
+		if (m_Flying)
+			m_RigidBody.gravityScale = 0;
 
     }
 	
@@ -95,7 +97,7 @@ public class Nemesis : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate ()
     {
-        m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+        //m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
 
         m_CanJump = false;
         Collider2D[] jumpColliders = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
@@ -140,10 +142,9 @@ public class Nemesis : MonoBehaviour {
                 if (m_IsRushing)
                 {
                     float loss = m_RushSuckPerSecond * Time.deltaTime;
-                    m_Energy -= loss;
+                    //m_Energy -= loss;
                     m_MoveSpeed = m_RushSpeed;
                 }
-                
                 else
                 {
                     m_RushLight.gameObject.SetActive(false);
@@ -151,87 +152,122 @@ public class Nemesis : MonoBehaviour {
                     m_MoveSpeed = m_MoveSpeedPostRush;
                 }
 
-                // check ladder
-                bool collidesLadder = false;
-                Collider2D[] ladderColliders = Physics2D.OverlapAreaAll(new Vector2(transform.position.x-0.2f, transform.position.y - 0.2f),
-			                                                            new Vector2(transform.position.x+0.2f, transform.position.y + 0.2f));
-                GameObject ladder = null;
+				if (m_Flying)
+				{
+					if (axisValueX != 0 || axisValueY != 0)
+					{
+						if (axisValueX != 0)
+							m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
+						m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, axisValueY * m_MoveSpeed), ForceMode2D.Impulse);
+					}
+					
+					// footstep sound
+					if (m_StepSource != null)
+					{
+						Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
+						Vector2 delta = new Vector2(currentPosition.x - m_LastPosition.x,
+						                            currentPosition.y - m_LastPosition.y);
+						float velocity = delta.magnitude / Time.deltaTime;
+						if (Mathf.Abs(velocity) > 0.1)
+						{
+							if (m_PlayStepSoundTimer > 0)
+							{
+								m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
+							}
+							else
+							{
+								m_PlayStepSoundTimer = 1;
+								m_StepSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+								m_StepSource.Play();
+							}
+						}
+					}
+				}
+				else
+				{
 
-                for (int i = 0; i < ladderColliders.Length; ++i)
-                {
-                    if (ladderColliders[i].gameObject.tag.Equals("Ladder"))
-                    {
-                        collidesLadder = true;
-                        ladder = ladderColliders[i].gameObject;
-                        break;
-                    }
-                }
-                if (collidesLadder && !m_IsOnLadder)
-                {
-                    if (axisValueY < -0.5 && Mathf.Abs(axisValueX) < 0.5)
-                    {
-                        //up near a ladder : get on ladder
-                        m_IsOnLadder = true;
-                        m_RigidBody.isKinematic = true;
-					    transform.position = new Vector3(ladder.transform.position.x, transform.position.y, transform.position.z);
-                    }
-                }
-                else if (!collidesLadder && m_IsOnLadder)
-                {
-                    m_RigidBody.isKinematic = false;
-                    m_IsOnLadder = false;
-                }
-
-                if (m_IsOnLadder)
-                {
-                    // Jump
-                    if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down"))
-                    {
-                        m_IsOnLadder = false;
-                        m_RigidBody.isKinematic = false;
-                    }
-                    else
-                    {
-                        Vector3 toAdd = new Vector3(0, -axisValueY * Time.deltaTime * m_LadderClimbSpeed, 0);
-                        transform.position = transform.position + toAdd;
-                    }
-                }
-                else
-                {
-
-                    if (axisValueX != 0)
-                    {
-                        m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
-                        m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
-                    }
-
-                    // footstep sound
-                    if (m_StepSource != null)
-                    {
-                        Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
-                        float velocity = Mathf.Abs((currentPosition.x - m_LastPosition.x) / Time.deltaTime);
-                        if (Mathf.Abs(velocity) > 0.1 && m_CanJump)
-                        {
-                            if (m_PlayStepSoundTimer > 0)
-                            {
-                                m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
-                            }
-                            else
-                            {
-                                m_PlayStepSoundTimer = 1;
-                                m_StepSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
-                                m_StepSource.Play();
-                            }
-                        }
-                    }
-
-
-                    if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down") && m_CanJump)
-                    {
-                        m_CanJump = false;
-                        m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
-                    }
-                }
+					// check ladder
+					bool collidesLadder = false;
+					Collider2D[] ladderColliders = Physics2D.OverlapAreaAll(new Vector2(transform.position.x-0.2f, transform.position.y - 0.2f),
+					                                                        new Vector2(transform.position.x+0.2f, transform.position.y + 0.2f));
+					GameObject ladder = null;
+					
+					for (int i = 0; i < ladderColliders.Length; ++i)
+					{
+						if (ladderColliders[i].gameObject.tag.Equals("Ladder"))
+						{
+							collidesLadder = true;
+							ladder = ladderColliders[i].gameObject;
+							break;
+						}
+					}
+					if (collidesLadder && !m_IsOnLadder)
+					{
+						if (axisValueY < -0.5 && Mathf.Abs(axisValueX) < 0.5)
+						{
+							//up near a ladder : get on ladder
+							m_IsOnLadder = true;
+							m_RigidBody.isKinematic = true;
+							transform.position = new Vector3(ladder.transform.position.x, transform.position.y, transform.position.z);
+						}
+					}
+					else if (!collidesLadder && m_IsOnLadder)
+					{
+						m_RigidBody.isKinematic = false;
+						m_IsOnLadder = false;
+					}
+					
+					if (m_IsOnLadder)
+					{
+						// Jump
+						if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down"))
+						{
+							m_IsOnLadder = false;
+							m_RigidBody.isKinematic = false;
+						}
+						else
+						{
+							Vector3 toAdd = new Vector3(0, -axisValueY * Time.deltaTime * m_LadderClimbSpeed, 0);
+							transform.position = transform.position + toAdd;
+						}
+					}
+					else
+					{
+						
+						if (axisValueX != 0)
+						{
+							m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
+							m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
+						}
+						
+						// footstep sound
+						if (m_StepSource != null)
+						{
+							Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
+							float velocity = Mathf.Abs((currentPosition.x - m_LastPosition.x) / Time.deltaTime);
+							if (Mathf.Abs(velocity) > 0.1 && m_CanJump)
+							{
+								if (m_PlayStepSoundTimer > 0)
+								{
+									m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
+								}
+								else
+								{
+									m_PlayStepSoundTimer = 1;
+									m_StepSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+									m_StepSource.Play();
+								}
+							}
+						}
+						
+						
+						if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down") && m_CanJump)
+						{
+							m_CanJump = false;
+							m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
+						}
+					}
+				}
             }
 
             if (m_GruntSource != null)
