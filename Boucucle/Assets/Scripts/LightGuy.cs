@@ -108,7 +108,6 @@ public class LightGuy : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate ()
     {
-
         m_CanJump = false;
         Collider2D[] jumpColliders = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
                                              m_Collider.transform.position + new Vector3( 0.2f, -m_Collider.bounds.extents.y + 0.1f, 0));
@@ -124,7 +123,11 @@ public class LightGuy : MonoBehaviour {
         {
             // update controls
             float axisValueX = Input.GetAxis("HorizontalP1Joy");
-            float axisValueY = Input.GetAxis("VerticalP1Joy");
+			if (axisValueX == 0)
+				axisValueX = Input.GetAxis("HorizontalP1Keyboard");
+			float axisValueY = Input.GetAxis("VerticalP1Joy");
+			if (axisValueY == 0)
+				axisValueY = Input.GetAxis("VerticalP1Keyboard");
 
             // check ladder
             bool collidesLadder = false;
@@ -197,7 +200,7 @@ public class LightGuy : MonoBehaviour {
                 }
 
                 //Blast
-                if (Input.GetAxis("BlastP1Joy") < 0) // xbox left trigger
+				if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
                 {
                     m_BlastLight.gameObject.SetActive(true);
                     m_IsBlasting = true;

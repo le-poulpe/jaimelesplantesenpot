@@ -141,11 +141,15 @@ public class Nemesis : MonoBehaviour {
             {
                 m_StunLight.gameObject.SetActive(false);
 				// update controls
-                float axisValueX = Input.GetAxis("HorizontalP2Joy");
-                float axisValueY = Input.GetAxis("VerticalP2Joy");
+				float axisValueX = Input.GetAxis("HorizontalP2Joy");
+				if (axisValueX == 0)
+					axisValueX = Input.GetAxis("HorizontalP2Keyboard");
+				float axisValueY = Input.GetAxis("VerticalP2Joy");
+				if (axisValueY == 0)
+					axisValueY = Input.GetAxis("VerticalP2Keyboard");
                 
                 //Rush
-                if (Input.GetAxis("BlastP2Joy") < 0) // xbox left trigger
+				if (Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0) // xbox left trigger
                 {
                     m_RushLight.gameObject.SetActive(true);
                     m_IsRushing = true;
@@ -176,7 +180,7 @@ public class Nemesis : MonoBehaviour {
 					{
 						if (axisValueX != 0)
 							m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
-						m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, axisValueY * m_MoveSpeed), ForceMode2D.Impulse);
+						m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, -axisValueY * m_MoveSpeed), ForceMode2D.Impulse);
 					}
 					
 					// footstep sound
