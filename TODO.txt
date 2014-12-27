@@ -2,6 +2,7 @@ TODO (27-12)
 
 0 - Blast stun : Le blast stun le dark s'il se trouve dans l'aire d'effet (diamètre 1.25, durée indépendante du temps d'exposition mais effectif tant qu'exposé, durée minimale définie dans m_StunTime)
 0 - Score : Tableau de score sur 10, +1 point par pot collecté par light guy, 4 points en cas de collecte des 3 pots, 4 points pour némésis moins le nombre de pot collectés par light guy en cas de victoire
+	0 - FeedbackAudio quand un pot est ramassé (un son différent pour le(s) premier(s) pot(s) et pour l'avant dernier et le dernier ?)
 0 - Correction du beam qui considère un hit quoi qu'il arrive lors d'un tir suivant un hit véritable
 0 - Correction des contrôles
 

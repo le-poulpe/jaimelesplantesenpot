@@ -20,6 +20,8 @@ public class GameState : MonoBehaviour {
     public GameObject m_LightScreen;
     public GameObject m_DarkScreen;
 	public GameObject m_MenuMusic;
+	public GameObject m_NemesisVictoryMusic;
+	public GameObject m_LightGuyVictoryMusic;
 
 	// Use this for initialization
 	void Start () {
@@ -43,12 +45,16 @@ public class GameState : MonoBehaviour {
                 m_LightScreen.SetActive(false);
                 m_DarkScreen.SetActive(false);
 				m_MenuMusic.SetActive(true);
+				m_NemesisVictoryMusic.SetActive(false);
+				m_LightGuyVictoryMusic.SetActive(false);
                 break;
             case E_GameState.GM_PLAY:
                 m_TitleScreen.SetActive(false);
                 m_LightScreen.SetActive(false);
                 m_DarkScreen.SetActive(false);
 				m_MenuMusic.SetActive(false);
+				m_NemesisVictoryMusic.SetActive(false);
+				m_LightGuyVictoryMusic.SetActive(false);
                 m_Spawner.Spawn();
                 m_LightGuy = FindObjectOfType<LightGuy>();
                 m_Nemesis = FindObjectOfType<Nemesis>();
@@ -57,6 +63,7 @@ public class GameState : MonoBehaviour {
                 m_TitleScreen.SetActive(false);
                 m_LightScreen.SetActive(true);
                 m_DarkScreen.SetActive(false);
+				m_LightGuyVictoryMusic.SetActive(true);
 	            m_LightGuy.enabled = false;
 	            m_Nemesis.enabled = false;
                 break;
@@ -66,6 +73,7 @@ public class GameState : MonoBehaviour {
 				m_DarkScreen.SetActive(true);
 				m_LightGuy.enabled = false;
 				m_Nemesis.enabled = false;
+				m_NemesisVictoryMusic.SetActive(true);
                 break;
         }
     }

@@ -29,6 +29,8 @@ public class LightGuy : MonoBehaviour {
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
+	public GameObject m_GotPotFeedback = null;
+	public GameObject m_DyingLightGuyFeedback = null;
     public GameObject m_Shoot = null;
     public float m_MinAuraIntensity = 0;
     public float m_MaxAuraIntensity = 2;
@@ -46,6 +48,7 @@ public class LightGuy : MonoBehaviour {
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
+		m_GotPotFeedback.gameObject.SetActive(false);
 
         if (m_Nemesis == null)
         {
@@ -66,6 +69,14 @@ public class LightGuy : MonoBehaviour {
         if (m_BlastLight == null)
         {
             Debug.LogError("No blast light 2D attached to lightguy !");
+        }
+		if (m_GotPotFeedback == null)
+        {
+            Debug.LogError("No pot feedback object attached to lightguy !");
+        }
+		if (m_DyingLightGuyFeedback == null)
+        {
+            Debug.LogError("No low energy feedback object attached to lightguy !");
         }
         else
         {
@@ -91,7 +102,7 @@ public class LightGuy : MonoBehaviour {
             m_AttackingNemesis = true;
         else if (coll.gameObject.GetComponentInParent<PotDeFleur>() != null)
         {
-			Object.Destroy(coll.gameObject);
+			Object.Destroy(coll.gameObject);		
         }
     }
 
@@ -116,6 +127,16 @@ public class LightGuy : MonoBehaviour {
                 break;
             }
         }
+		
+		if (m_Energy > 1 && m_Energy < 13.5)
+		{
+		m_DyingLightGuyFeedback.gameObject.SetActive(true);
+		}
+		else
+		{
+		m_DyingLightGuyFeedback.gameObject.SetActive(false);
+		}
+		
         if (m_Energy > 0)
         {
             // update controls
