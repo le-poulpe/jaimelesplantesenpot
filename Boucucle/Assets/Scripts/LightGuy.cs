@@ -287,7 +287,10 @@ public class LightGuy : MonoBehaviour {
 								{
 									Nemesis nemesis = go.GetComponentInParent<Nemesis>();
 									if (nemesis != null)
+									{
 										nemesis.StunByBlast();
+										nemesis.Repel(dir, true);
+									}
 									break;
 								}
 							}

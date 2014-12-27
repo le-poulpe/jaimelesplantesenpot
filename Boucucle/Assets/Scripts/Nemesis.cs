@@ -15,14 +15,15 @@ public class Nemesis : MonoBehaviour {
     private bool m_IsRushing = false;
     private bool m_IsOnLadder = false;
 
-	public float m_BeamRepel = 1.0f;
     public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
     public float m_MoveSpeedPostRush = 1;   
 	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
 	public float m_StunTime = 1.0f;
+	public float m_BeamRepel = 1.0f;
 	public float m_BlastStunTime = 0.125f;
+	public float m_BlastRepel = 1.0f;
     public float m_StepRate = 1.0f;
     public float m_GruntRate = 1.0f;
     public float m_MaxEnergy = 83f;
@@ -322,12 +323,13 @@ public class Nemesis : MonoBehaviour {
         m_StunTimer = m_StunTime;
     }
 	
-	public void Repel(Vector2 dir)
+	public void Repel(Vector2 dir, bool blast = false)
 	{
 		float dot = dir.x * m_RigidBody.velocity.x + dir.y * m_RigidBody.velocity.y;
+		float mult = blast ? m_BlastRepel : m_BeamRepel;
 		if (dot < 0)
 			m_RigidBody.velocity -= dir*dot;
-		m_RigidBody.AddForce (new Vector2 (dir.x * m_BeamRepel, dir.y * m_BeamRepel));
+		m_RigidBody.AddForce (new Vector2 (dir.x * mult, dir.y * mult));
 	}
 	
 	public void StunByBlast()
