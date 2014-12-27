@@ -214,7 +214,7 @@ public class LightGuy : MonoBehaviour {
                 }
 
                 // Jump
-                if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space") && m_CanJump)
+                if ((Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space")) && m_CanJump)
                 {
                     m_CanJump = false;
                     m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
