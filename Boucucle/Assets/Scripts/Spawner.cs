@@ -51,9 +51,9 @@ public class Spawner : MonoBehaviour {
 				bool canSpawn = true;
 				for (int k = 0; k < potDeFleurs.Count && canSpawn; ++k)
 				{
-					Vector2 delta = potDeFleurs[k].transform.position;
+					Vector2 delta = potDeFleurs[k].transform.position - transform.position;
 					delta = delta - pos;
-					if (delta.magnitude < m_MinPotDeFleursDistance)
+					if (delta.magnitude <= m_MinPotDeFleursDistance)
 						canSpawn = false;
 				}
 				if (canSpawn)

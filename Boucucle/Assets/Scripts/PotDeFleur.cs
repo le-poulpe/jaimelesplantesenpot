@@ -19,9 +19,6 @@ public class PotDeFleur : MonoBehaviour {
 		{
 			Debug.LogError("no light set on the pot de fleur !");
 		}
-		else
-		{
-		}
 
         m_LightGuys = FindObjectsOfType(typeof(LightGuy)) as LightGuy[];
 	}
