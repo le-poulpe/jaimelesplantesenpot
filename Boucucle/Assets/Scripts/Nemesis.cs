@@ -36,8 +36,8 @@ public class Nemesis : MonoBehaviour {
     public float m_MeshRotateSpeed2 = 1;
     public float m_MeshRotateSpeed3 = 1;
 	public float m_MeshRotateSpeed4	= 1;
-	public bool m_Flying = true;
 	public float m_MeshRotateSpeed5	= 1;
+	public bool m_Flying = true;
     public Light m_RushLight = null;
 	public GameObject m_DrainingLight = null;
 	public GameObject m_StunLight = null;
