@@ -14,8 +14,6 @@ public class LightGuy : MonoBehaviour {
     private float m_ShootAngle = 0f;
     private bool m_IsOnLadder = false;
 
-    private GameState m_GameState;
-
     public GameObject m_Cursor;
 	private bool m_AttackingNemesis = false;
 
@@ -48,7 +46,6 @@ public class LightGuy : MonoBehaviour {
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
-        m_GameState = FindObjectOfType<GameState>();
 
         if (m_Nemesis == null)
         {

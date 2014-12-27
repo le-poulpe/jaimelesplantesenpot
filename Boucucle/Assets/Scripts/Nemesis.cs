@@ -43,7 +43,6 @@ public class Nemesis : MonoBehaviour {
     public GameObject m_MeshRotate3;
     public GameObject m_MeshRotate4;
 	public GameObject m_MeshRotate5;
-    private GameState m_GameState;
 
     public AudioSource m_StepSource;
     public AudioSource m_GruntSource;
@@ -84,7 +83,6 @@ public class Nemesis : MonoBehaviour {
 	        m_PlayStepSoundTimer = 1;
 			m_LastPosition = new Vector2(transform.position.x, transform.position.y);
 	        m_Energy = m_MaxEnergy;
-	        m_GameState = FindObjectOfType<GameState>();
         }
 
 		if (m_Flying)

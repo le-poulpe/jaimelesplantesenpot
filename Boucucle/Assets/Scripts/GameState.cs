@@ -12,9 +12,9 @@ public class GameState : MonoBehaviour {
     };
 
     static bool m_Once = false;
-    LightGuy m_LightGuy;
-    Nemesis m_Nemesis;
-    Spawner m_Spawner;
+    LightGuy m_LightGuy = null;
+    Nemesis m_Nemesis = null;
+    Spawner m_Spawner = null;
     E_GameState m_GameState;
     public GameObject m_TitleScreen;
     public GameObject m_LightScreen;
@@ -79,15 +79,18 @@ public class GameState : MonoBehaviour {
                     SetGameState(E_GameState.GM_PLAY);
                 break;
 			case E_GameState.GM_PLAY:
-				if (m_LightGuy.IsDead())
-					SetGameState(E_GameState.GM_NEM_WIN);
-				else if (m_Nemesis.IsDead())
-					SetGameState(E_GameState.GM_LIGHT_WIN);
-				else
+				if (m_LightGuy != null && m_Nemesis != null) // WHY should I check this ?
 				{
-					PotDeFleur[] potsdeFleur = FindObjectsOfType<PotDeFleur>();
-					if (potsdeFleur.Length == 0)				
+					if (m_LightGuy.IsDead())
+						SetGameState(E_GameState.GM_NEM_WIN);
+					else if (m_Nemesis.IsDead())
 						SetGameState(E_GameState.GM_LIGHT_WIN);
+					else
+					{
+						PotDeFleur[] potsdeFleur = FindObjectsOfType<PotDeFleur>();
+						if (potsdeFleur.Length == 0)				
+							SetGameState(E_GameState.GM_LIGHT_WIN);
+					}
 				}
 				break;
             case E_GameState.GM_LIGHT_WIN:
