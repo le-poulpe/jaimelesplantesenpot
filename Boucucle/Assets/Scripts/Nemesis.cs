@@ -19,8 +19,9 @@ public class Nemesis : MonoBehaviour {
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
     public float m_MoveSpeedPostRush = 1;   
-    public float m_RushSpeed = 1;   //Vitesse augmentée en rush
-    public float m_StunTime = 1.0f;
+	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
+	public float m_StunTime = 1.0f;
+	public float m_BlastStunTime = 0.125f;
     public float m_StepRate = 1.0f;
     public float m_GruntRate = 1.0f;
     public float m_MaxEnergy = 83f;
@@ -322,7 +323,7 @@ public class Nemesis : MonoBehaviour {
 	
 	public void StunByBlast()
     {
-        m_StunTimer = m_StunTime / 8;
+		m_StunTimer = m_BlastStunTime;
     }
 
     public void Heal(float energy)

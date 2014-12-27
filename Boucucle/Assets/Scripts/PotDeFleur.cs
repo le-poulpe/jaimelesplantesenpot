@@ -11,7 +11,7 @@ public class PotDeFleur : MonoBehaviour {
 
     public float m_LightTriggerDistance;
     public Vector2 m_LightMinMaxRange;
-    public Vector2 m_LightMinMaxIntensity;
+	public Vector2 m_LightMinMaxIntensity;
 
 	// Use this for initialization
 	void Start () {
