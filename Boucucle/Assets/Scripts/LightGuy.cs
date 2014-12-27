@@ -26,6 +26,8 @@ public class LightGuy : MonoBehaviour {
     public float m_ShootSuckPerSecond = 10;
     public float m_RotationSpeed = 400f;
     public float m_LadderClimbSpeed = 1;
+	public float m_BlastStunDistance = 1.25f;
+	public AudioSource m_DisappearSound = null;
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
@@ -102,7 +104,8 @@ public class LightGuy : MonoBehaviour {
             m_AttackingNemesis = true;
         else if (coll.gameObject.GetComponentInParent<PotDeFleur>() != null)
         {
-			Object.Destroy(coll.gameObject);		
+			Object.Destroy(coll.gameObject);
+			m_DisappearSound.Play();
         }
     }
 
@@ -264,26 +267,32 @@ public class LightGuy : MonoBehaviour {
                     m_Energy -= loss;
 
                     //nemesis sucks light if touched by blast
-                    Vector2 dir = m_Nemesis.transform.position - this.transform.position;
-                    dir.Normalize();
-                    RaycastHit2D[] hits = Physics2D.RaycastAll(this.transform.position, dir);
-                    bool nemesisTouched = false;
-                    for (int i = 0; i < hits.Length; ++i)
-                    {
-                        if (hits[i].collider == m_Collider)
-                            continue;
-							
-						if (hits[i].collider)
-					
-                        if (hits[i].collider.gameObject.GetComponentInParent<Nemesis>() != null)
+                    Vector2 delta = m_Nemesis.transform.position - this.transform.position;
+					if (delta.magnitude < m_BlastStunDistance)
+					{
+						// Raycast to check if touched
+						RaycastHit2D[] hit;
+						Vector2 dir = m_Nemesis.transform.position - transform.position;
+						dir.Normalize();
+						hit = Physics2D.RaycastAll(transform.position, dir, m_BlastStunDistance);
+						for (int i = 0; i < hit.Length; ++i)
+						{
+							if (!hit[i].collider.isTrigger)
 							{
-								nemesisTouched = true;
+								if (hit[i].collider == m_Collider)
+									continue;
+
+								GameObject go = hit[i].collider.gameObject;
+								if (go != null)
+								{
+									Nemesis nemesis = go.GetComponentInParent<Nemesis>();
+									if (nemesis != null)
+										nemesis.StunByBlast();
+									break;
+								}
 							}
-                        break;
-                    }
-                    /*if (nemesisTouched)
-                        m_Nemesis.Heal(loss * 0.5f);
-						m_Nemesis.StunByBlast();*/
+						}
+					}
                 }
 
                 // die less slowly if shooting
