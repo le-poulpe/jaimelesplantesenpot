@@ -51,6 +51,11 @@ public class LaserBeam : MonoBehaviour
 		m_HitObject = null;
 	}
 
+	public Vector2 GetDir()
+	{
+		return new Vector2 (myTransform.right.x, myTransform.right.y);
+	}
+
     void RenderLaser()
     {
 

@@ -311,6 +311,7 @@ public class LightGuy : MonoBehaviour {
                             if (nemesis != null)
                             {
                                 nemesis.Stun();
+								nemesis.Repel(beam.GetDir());
                                 nemesis.Heal(loss);													
                             }
                         }
