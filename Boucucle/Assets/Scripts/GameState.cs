@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameState : MonoBehaviour {
@@ -10,6 +11,10 @@ public class GameState : MonoBehaviour {
         GM_LIGHT_WIN,
         GM_NEM_WIN
     };
+	
+	static int m_ScoreP1 = 0;
+	static int m_ScoreP2 = 0;
+	int m_NbPots = 0;
 
     static bool m_Once = false;
     LightGuy m_LightGuy = null;
@@ -22,6 +27,7 @@ public class GameState : MonoBehaviour {
 	public GameObject m_MenuMusic;
 	public GameObject m_NemesisVictoryMusic;
 	public GameObject m_LightGuyVictoryMusic;
+	public Text	      m_ScoreText;
 
 	// Use this for initialization
 	void Start () {
@@ -32,7 +38,14 @@ public class GameState : MonoBehaviour {
             SetGameState(E_GameState.GM_TITLE);
         }
         else
-            SetGameState(E_GameState.GM_PLAY);
+		{
+			if (m_ScoreP1 > 12 || m_ScoreP2 > 12)
+			{
+				m_ScoreP1 = m_ScoreP2 = 0;
+			}
+	        SetGameState(E_GameState.GM_PLAY);
+		}
+		UpdateScore();
 	}
 	
     void SetGameState(E_GameState state)
@@ -87,19 +100,29 @@ public class GameState : MonoBehaviour {
                     SetGameState(E_GameState.GM_PLAY);
                 break;
 			case E_GameState.GM_PLAY:
-				if (m_LightGuy != null && m_Nemesis != null) // WHY should I check this ?
+				PotDeFleur[] potsdeFleur = FindObjectsOfType<PotDeFleur>();
+				int currentNbPots = potsdeFleur.Length;
+				if (currentNbPots < m_NbPots)
 				{
-					if (m_LightGuy.IsDead())
-						SetGameState(E_GameState.GM_NEM_WIN);
-					else if (m_Nemesis.IsDead())
-						SetGameState(E_GameState.GM_LIGHT_WIN);
+					if (currentNbPots >= 2)
+						m_ScoreP1 += 1;
+					else if (currentNbPots >= 1)
+						m_ScoreP1 += 2;
 					else
-					{
-						PotDeFleur[] potsdeFleur = FindObjectsOfType<PotDeFleur>();
-						if (potsdeFleur.Length == 0)				
-							SetGameState(E_GameState.GM_LIGHT_WIN);
-					}
+						m_ScoreP1 += 3;
+					UpdateScore();
 				}
+				m_NbPots = currentNbPots;
+				if (m_LightGuy.IsDead())
+				{
+					SetGameState(E_GameState.GM_NEM_WIN);
+					m_ScoreP2 += 3;
+					UpdateScore();
+				}
+				else if (m_Nemesis.IsDead())
+					SetGameState(E_GameState.GM_LIGHT_WIN);
+				else if (potsdeFleur.Length == 0)				
+					SetGameState(E_GameState.GM_LIGHT_WIN);
 				break;
             case E_GameState.GM_LIGHT_WIN:
             case E_GameState.GM_NEM_WIN:
@@ -108,4 +131,9 @@ public class GameState : MonoBehaviour {
                 break;
         }
     }
+
+	void UpdateScore()
+	{
+		m_ScoreText.text = "" + m_ScoreP1 + " | " + m_ScoreP2;
+	}
 }
