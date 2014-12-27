@@ -46,6 +46,11 @@ public class LaserBeam : MonoBehaviour
         RenderLaser();
     }
 
+	void OnEnable()
+	{
+		m_HitObject = null;
+	}
+
     void RenderLaser()
     {
 
