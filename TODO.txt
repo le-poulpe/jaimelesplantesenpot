@@ -1,3 +1,11 @@
+TODO (27-12)
+
+0 - Blast stun : Le blast stun le dark s'il se trouve dans l'aire d'effet (diamètre 1.25, durée indépendante du temps d'exposition mais effectif tant qu'exposé, durée minimale définie dans m_StunTime)
+0 - Score : Tableau de score sur 10, +1 point par pot collecté par light guy, 4 points en cas de collecte des 3 pots, 4 points pour némésis moins le nombre de pot collectés par light guy en cas de victoire
+0 - Correction du beam qui considère un hit quoi qu'il arrive lors d'un tir suivant un hit véritable
+0 - Correction des contrôles
+
+
 Brainstorm tard le soir :
 
 problèmes actuels :
@@ -7,11 +15,13 @@ problèmes actuels :
 - peu de tension dans les affrontements (trop brefs)
 
 idées:
-- Dark Guy pourrait voler pour régler le problème de contrôle
-- On pourrait avoir 3 pots de fleur au lieu d'un pour éviter les injustices et homogénéiser le temps des parties
+- Ajouter un sélecteur de map 
+- Mode de jeu (flying nemesis & classic)
+	- Dark Guy pourrait voler pour régler le problème de contrôle
+@@ - On pourrait avoir 3 pots de fleur au lieu d'un pour éviter les injustices et homogénéiser le temps des parties
 - si on montre les objectifs très brièvement en début de partie, ça permettrait au light guy de s'organiser, donc de prendre des décisions intéressantes affectant le déroulement de la partie. Et pareil pour le dark guy => mindgame.
 - le light guy pourrait avoir une arme ultime mais utilisable une seule fois (gourmande en vie ?), genre une bande de lumière qui balaie la carte et qui tue le dark guy s'il est dedans.
-- on pourrait avoir un système de points, avec un first to ten ou équivalent : quand light guy trouve un pot de fleur, il gagne un point, tandis que dark guy gagne deux points quand il tue Light Guy.
+@@ - on pourrait avoir un système de points, avec un first to ten ou équivalent : quand light guy trouve un pot de fleur, il gagne un point, tandis que dark guy gagne deux points quand il tue Light Guy.
 - vie du dark guy : on pourrait virer le système de vie du dark guy, et juste le rendre beaucoup plus visible quand il rush. Si révéler sa position est très dangereux pour lui, ça reste intéressant.
 
 *******************
