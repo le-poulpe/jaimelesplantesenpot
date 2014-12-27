@@ -282,7 +282,7 @@ public class Nemesis : MonoBehaviour {
 						}
 						
 						
-						if (Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down") && m_CanJump)
+						if ((Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("right ctrl") || Input.GetKeyDown("page down")) && m_CanJump)
 						{
 							m_CanJump = false;
 							m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
