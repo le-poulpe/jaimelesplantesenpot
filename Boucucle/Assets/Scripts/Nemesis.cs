@@ -45,6 +45,7 @@ public class Nemesis : MonoBehaviour {
     public float m_MeshRotateSpeed3 = 1;
 	public float m_MeshRotateSpeed4	= 1;
 	public float m_MeshRotateSpeed5	= 1;
+	public float m_MeshRotateSpeed6	= 1;
 	public bool m_Flying = true;
     public Light m_RushLight = null;
 	public GameObject m_DrainingLight = null;
@@ -52,8 +53,9 @@ public class Nemesis : MonoBehaviour {
     public GameObject m_MeshRotate1;
     public GameObject m_MeshRotate2;
     public GameObject m_MeshRotate3;
-    public GameObject m_MeshRotate4;
+	public GameObject m_MeshRotate4;
 	public GameObject m_MeshRotate5;
+	public GameObject m_MeshRotate6;
 	public GameObject m_SneakMesh;
 	public GameObject m_NormaMesh;
 
@@ -141,6 +143,7 @@ public class Nemesis : MonoBehaviour {
         m_MeshRotate3.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3, Time.deltaTime * m_MeshRotateSpeed3));
 		m_MeshRotate4.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4, Time.deltaTime * m_MeshRotateSpeed4));
 		m_MeshRotate5.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed5, Time.deltaTime * m_MeshRotateSpeed5, Time.deltaTime * m_MeshRotateSpeed5));
+		m_MeshRotate6.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed6, Time.deltaTime * m_MeshRotateSpeed6, Time.deltaTime * m_MeshRotateSpeed6));
         
 		if (m_Energy > 0)
         {	
@@ -163,7 +166,7 @@ public class Nemesis : MonoBehaviour {
 
 
 				bool rush = Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0;
-				bool sneak = Input.GetAxis("SneakP2Joy") < 0 || Input.GetAxis("SneakP2Keyboard") < 0;
+				bool sneak = Input.GetAxis("SneakP2Joy") > 0 || Input.GetAxis("SneakP2Keyboard") > 0;
 				//Rush
 				switch (m_State)
 				{
