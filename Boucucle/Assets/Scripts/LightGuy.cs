@@ -17,7 +17,8 @@ public class LightGuy : MonoBehaviour {
     public GameObject m_Cursor;
 	private bool m_AttackingNemesis = false;
 
-    public float m_JumpImpulse = 5;
+    public float m_JumpImpulse = 35;
+	public float m_LadderJumpImpulse = 18;
     public float m_MoveSpeed = 1;
     public float m_MaxEnergy = 100;
     public float m_EnergyLossPerSecond = 0.1f;
@@ -187,7 +188,8 @@ public class LightGuy : MonoBehaviour {
                 if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space"))
                 {
                     m_IsOnLadder = false;
-                    m_RigidBody.isKinematic = false;
+					m_RigidBody.isKinematic = false;
+					m_RigidBody.AddForce(new Vector2(m_LadderJumpImpulse * axisValueX, -m_LadderJumpImpulse * axisValueY), ForceMode2D.Impulse);
                 }
                 else
                 {
@@ -199,19 +201,10 @@ public class LightGuy : MonoBehaviour {
             {
                 if (axisValueX != 0 || axisValueY != 0)
                 {
-                    m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
                     m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
                 }
 
                 m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
-
-                if (m_Cursor != null)
-                {
-                    if (axisValueX != 0 || axisValueY != 0)
-                    {
-                        m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
-                    }
-                }
 
                 // Jump
                 if ((Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space")) && m_CanJump)
@@ -220,107 +213,118 @@ public class LightGuy : MonoBehaviour {
                     m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
                 }
 
-                //Blast
-				if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
-                {
-                    m_BlastLight.gameObject.SetActive(true);
-                    m_IsBlasting = true;
-                }
-                else
-                {
-                    m_BlastLight.gameObject.SetActive(false);
-                    m_IsBlasting = false;
-                }
+            }
+			
+			m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
 
-                //Shoot
-                if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
-                {
-                    m_Shoot.gameObject.SetActive(true);
-                    m_IsShooting = true;
-                }
-                else if (Input.GetKeyUp(KeyCode.Joystick1Button2) || Input.GetKeyUp("left shift"))
-                {
-                    m_Shoot.gameObject.SetActive(false);
-                    m_IsShooting = false;
-                }
-
-
-                // update light
-                if (m_AuraLight != null)
-                    m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
-
-                // die slowly
-                m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
-
-                // die less slowly if in contact with nemesis
-                if (m_AttackingNemesis)
-                {
-                    float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
-                    m_Energy -= loss;
-                    m_Nemesis.Heal(loss);	
-                }
-
-                // die less slowly if blasting
-                if (m_IsBlasting)
-                {
-                    float loss = m_BlastSuckPerSecond * Time.deltaTime;
-                    m_Energy -= loss;
-
-                    //nemesis sucks light if touched by blast
-                    Vector2 delta = m_Nemesis.transform.position - this.transform.position;
-					if (delta.magnitude < m_BlastStunDistance)
+			if (m_Cursor != null)
+			{
+				if (axisValueX != 0 || axisValueY != 0)
+				{
+					m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
+				}
+			}
+			
+			//Blast
+			if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
+			{
+				m_BlastLight.gameObject.SetActive(true);
+				m_IsBlasting = true;
+			}
+			else
+			{
+				m_BlastLight.gameObject.SetActive(false);
+				m_IsBlasting = false;
+			}
+			
+			//Shoot
+			if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
+			{
+				m_Shoot.gameObject.SetActive(true);
+				m_IsShooting = true;
+			}
+			else if (Input.GetKeyUp(KeyCode.Joystick1Button2) || Input.GetKeyUp("left shift"))
+			{
+				m_Shoot.gameObject.SetActive(false);
+				m_IsShooting = false;
+			}
+			
+			
+			// update light
+			if (m_AuraLight != null)
+				m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
+			
+			// die slowly
+			m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+			
+			// die less slowly if in contact with nemesis
+			if (m_AttackingNemesis)
+			{
+				float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
+				m_Energy -= loss;
+				m_Nemesis.Heal(loss);	
+			}
+			
+			// die less slowly if blasting
+			if (m_IsBlasting)
+			{
+				float loss = m_BlastSuckPerSecond * Time.deltaTime;
+				m_Energy -= loss;
+				
+				//nemesis sucks light if touched by blast
+				Vector2 delta = m_Nemesis.transform.position - this.transform.position;
+				if (delta.magnitude < m_BlastStunDistance)
+				{
+					// Raycast to check if touched
+					RaycastHit2D[] hit;
+					Vector2 dir = m_Nemesis.transform.position - transform.position;
+					dir.Normalize();
+					hit = Physics2D.RaycastAll(transform.position, dir, m_BlastStunDistance);
+					for (int i = 0; i < hit.Length; ++i)
 					{
-						// Raycast to check if touched
-						RaycastHit2D[] hit;
-						Vector2 dir = m_Nemesis.transform.position - transform.position;
-						dir.Normalize();
-						hit = Physics2D.RaycastAll(transform.position, dir, m_BlastStunDistance);
-						for (int i = 0; i < hit.Length; ++i)
+						if (!hit[i].collider.isTrigger)
 						{
-							if (!hit[i].collider.isTrigger)
+							if (hit[i].collider == m_Collider)
+								continue;
+							
+							GameObject go = hit[i].collider.gameObject;
+							if (go != null)
 							{
-								if (hit[i].collider == m_Collider)
-									continue;
-
-								GameObject go = hit[i].collider.gameObject;
-								if (go != null)
+								Nemesis nemesis = go.GetComponentInParent<Nemesis>();
+								if (nemesis != null)
 								{
-									Nemesis nemesis = go.GetComponentInParent<Nemesis>();
-									if (nemesis != null)
-									{
-										nemesis.StunByBlast();
-										nemesis.Repel(dir, true);
-									}
-									break;
+									nemesis.StunByBlast();
+									nemesis.Repel(dir, true);
 								}
+								break;
 							}
 						}
 					}
-                }
-
-                // die less slowly if shooting
-                if (m_IsShooting)
-                {
-                    float loss = m_ShootSuckPerSecond * Time.deltaTime;
-                    m_Energy -= loss;
-                    m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
-                    LaserBeam beam = m_Shoot.GetComponentInChildren<LaserBeam>();
-                    if (beam != null)
-                    {
-                        GameObject go = beam.GetHitObject();
-                        if (go != null)
-                        {
-                            Nemesis nemesis = go.GetComponentInParent<Nemesis>();
-                            if (nemesis != null)
-                            {
-                                nemesis.Stun();
-								nemesis.Repel(beam.GetDir());
-                                nemesis.Heal(loss);													
-                            }
-                        }
-                    }
-                }
-            }
+				}
+			}
+			
+			// die less slowly if shooting
+			if (m_IsShooting)
+			{
+				float loss = m_ShootSuckPerSecond * Time.deltaTime;
+				m_Energy -= loss;
+				m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
+				LaserBeam beam = m_Shoot.GetComponentInChildren<LaserBeam>();
+				if (beam != null)
+				{
+					GameObject go = beam.GetHitObject();
+					if (go != null)
+					{
+						Nemesis nemesis = go.GetComponentInParent<Nemesis>();
+						if (nemesis != null)
+						{
+							nemesis.Stun();
+							nemesis.Repel(beam.GetDir());
+							nemesis.Heal(loss);													
+						}
+					}
+				}
+			}
         }
 	}
 }
