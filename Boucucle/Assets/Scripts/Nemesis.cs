@@ -194,7 +194,7 @@ public class Nemesis : MonoBehaviour {
 				case E_NemState.NS_RUSH:
 					m_RushTimer -= Time.deltaTime;
 					float t = (m_RushTime + m_RushCoolDown - m_RushTimer) / (m_RushTime);
-					t = Mathf.Sqrt(t);
+					t = Mathf.Pow(t, 0.3f);
 					m_CurrentSpeed = Mathf.Lerp(m_RushSpeed, m_RushEndSpeed, t);
 					if (!rush && m_RushTimer <= 0)
 					{
