@@ -19,10 +19,14 @@ public class Nemesis : MonoBehaviour {
     private float m_Energy;
 	private E_NemState m_State;
 	private float m_CurrentSpeed;
+	private float m_RushTimer;
 
     public float m_EnergySuckPerSecond = 80;
     public float m_MoveSpeed = 1;
 	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
+	public float m_RushEndSpeed = 0.2f;
+	public float m_RushTime = 1.0f;
+	public float m_RushCoolDown = 0.5f;
 	public float m_SneakSpeed = 0.3f;
 	public float m_StunTime = 1.0f;
 	public float m_BeamRepel = 1.0f;
@@ -102,6 +106,7 @@ public class Nemesis : MonoBehaviour {
 			m_SneakMesh.gameObject.SetActive(false);
             
 	        m_StunTimer = 0;
+			m_RushTimer = 0;
 	        m_PlayStepSoundTimer = 1;
 			m_LastPosition = new Vector2(transform.position.x, transform.position.y);
 	        m_Energy = m_MaxEnergy;
@@ -167,7 +172,6 @@ public class Nemesis : MonoBehaviour {
 				if (axisValueY == 0)
 					axisValueY = Input.GetAxis("VerticalP2Keyboard");
 
-
 				bool rush = Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0;
 				bool sneak = Input.GetAxis("SneakP2Joy") > 0 || Input.GetAxis("SneakP2Keyboard") < 0;
 				//Rush
@@ -177,6 +181,7 @@ public class Nemesis : MonoBehaviour {
 					if (rush)
 					{
 						m_RushLight.gameObject.SetActive(true);
+						m_RushTimer = m_RushTime + m_RushCoolDown;
 						m_State = E_NemState.NS_RUSH;
 					}
 					else if (sneak)
@@ -187,8 +192,11 @@ public class Nemesis : MonoBehaviour {
 					}
 					break;
 				case E_NemState.NS_RUSH:
-					m_CurrentSpeed = m_RushSpeed;
-					if (!rush)
+					m_RushTimer -= Time.deltaTime;
+					float t = (m_RushTime + m_RushCoolDown - m_RushTimer) / (m_RushTime);
+					t = Mathf.Sqrt(t);
+					m_CurrentSpeed = Mathf.Lerp(m_RushSpeed, m_RushEndSpeed, t);
+					if (!rush && m_RushTimer <= 0)
 					{
 						m_RushLight.gameObject.SetActive(false);
 						m_CurrentSpeed = m_MoveSpeed;
