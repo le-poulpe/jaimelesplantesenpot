@@ -41,6 +41,8 @@ public class Nemesis : MonoBehaviour {
 	public float m_RushCoolDown = 0.5f;
 	public float m_SneakSpeed = 0.3f;
 	public float m_StunTime = 1.0f;
+	public float m_StunLightIntensity = 1.0f;
+	public float m_StunLightMaxIntensity = 1.0f;
 	public float m_BeamRepel = 1.0f;
 	public float m_BlastStunTime = 0.125f;
 	public float m_BlastRepel = 1.0f;
@@ -54,8 +56,9 @@ public class Nemesis : MonoBehaviour {
 	public float m_MeshRotateSpeed5	= 1;
 	public float m_MeshRotateSpeed6	= 1;
 	public Light m_RushLight = null;
+	public Light m_StunLight = null;
+	public GameObject m_StunShockSound = null;
 	public GameObject m_DrainingLight = null;
-	public GameObject m_StunLight = null;
     public GameObject m_MeshRotate1;
     public GameObject m_MeshRotate2;
     public GameObject m_MeshRotate3;
@@ -99,15 +102,19 @@ public class Nemesis : MonoBehaviour {
         }
         if (m_RushLight == null)
         {
-            Debug.LogError("No rush light 2D attached to lightguy !");
+            Debug.LogError("No rush light attached to nemesis !");
         }
         if (m_DrainingLight == null)
         {
-            Debug.LogError("No draining light 2D attached to lightguy !");
+            Debug.LogError("No draining light attached to nemesis !");
         }
 		if (m_StunLight == null)
         {
-            Debug.LogError("No stun light 2D attached to lightguy !");
+            Debug.LogError("No stun light attached to nemesis !");
+        }
+		if (m_StunShockSound == null)
+        {
+            Debug.LogError("No stun shock sound attached to nemesis !");
         }
 
 	    m_RushLight.gameObject.SetActive(false);
@@ -184,9 +191,25 @@ public class Nemesis : MonoBehaviour {
 				m_RushLight.gameObject.SetActive(false);
 				m_RushTimer = 0;
 				m_CurrentSpeed = m_MoveSpeed;
-				m_State = E_NemState.NS_STUN;
+				m_State = E_NemState.NS_STUN;		
+				
+				if (m_StunTimer > m_StunTime * 0.95f)
+				{
+					m_StunShockSound.gameObject.SetActive(true);
+					m_StunLight.intensity = m_StunLightMaxIntensity;
+				}
+				
+				if (m_StunTimer < m_StunTime * 0.95f)
+				{
+					m_StunLight.intensity = m_StunLightIntensity * m_StunTimer / 2;
+				}
+				
+				if (m_StunTimer < m_StunTime * 0.90f)
+				{
+					m_StunShockSound.gameObject.SetActive(false);
+				}
 			}
-
+			
 			//Rush
 			switch (m_State)
 			{
