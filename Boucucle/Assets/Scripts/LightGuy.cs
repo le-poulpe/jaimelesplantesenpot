@@ -13,6 +13,7 @@ public class LightGuy : MonoBehaviour {
     private bool m_IsShooting = false;
     private float m_ShootAngle = 0f;
     private bool m_IsOnLadder = false;
+	private bool m_JumpButtonPressed = false; // used to debug a weird bug where Input.GetKeyDown returns true two frames in a row...
 
     public GameObject m_Cursor;
 	private bool m_AttackingNemesis = false;
@@ -135,11 +136,11 @@ public class LightGuy : MonoBehaviour {
 		
 		if (m_Energy > 1 && m_Energy < 13.5)
 		{
-		m_DyingLightGuyFeedback.gameObject.SetActive(true);
+			m_DyingLightGuyFeedback.gameObject.SetActive(true);
 		}
 		else
 		{
-		m_DyingLightGuyFeedback.gameObject.SetActive(false);
+			m_DyingLightGuyFeedback.gameObject.SetActive(false);
 		}
 		
         if (m_Energy > 0)
@@ -151,6 +152,10 @@ public class LightGuy : MonoBehaviour {
 			float axisValueY = Input.GetAxis("VerticalP1Joy");
 			if (axisValueY == 0)
 				axisValueY = Input.GetAxis("VerticalP1Keyboard");
+			
+			bool jumpJoy = Input.GetKeyDown(KeyCode.Joystick1Button0);
+			bool jumpKey = Input.GetKeyDown("space");
+			bool jump = jumpJoy || jumpKey;
 
             // check ladder
             bool collidesLadder = false;
@@ -186,7 +191,7 @@ public class LightGuy : MonoBehaviour {
             if (m_IsOnLadder)
             {
                 // Jump
-                if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space"))
+                if (jump && !m_JumpButtonPressed)
                 {
                     m_IsOnLadder = false;
 					m_RigidBody.isKinematic = false;
@@ -207,14 +212,16 @@ public class LightGuy : MonoBehaviour {
 
                 m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
 
-                // Jump
-                if ((Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space")) && m_CanJump)
+				// Jump
+				if (jump && !m_JumpButtonPressed && m_CanJump)
                 {
                     m_CanJump = false;
 					m_RigidBody.AddForce(new Vector2(axisValueX * m_JumpImpulseX, m_JumpImpulse), ForceMode2D.Impulse);
                 }
 
             }
+
+			m_JumpButtonPressed = jump;
 			
 			m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
 
