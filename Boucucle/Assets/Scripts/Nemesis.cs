@@ -22,6 +22,17 @@ public class Nemesis : MonoBehaviour {
 	private float m_CurrentSpeed;
 	private float m_RushTimer;
 
+	
+	
+	//step sound
+	public AudioSource m_StepSource;
+	public float m_MinStepFrequency = 1.0f;
+	public float m_MaxStepFrequency = 3.0f;
+	public float m_MinStepVolume = 0.3f;
+	public float m_MaxStepVolume = 1.0f;
+	public float m_MinStepSpeed = 0.2f; //below, no footstep
+	public float m_MaxStepSpeed = 1; //over, footstep does not change
+
     public float m_EnergySuckPerSecond = 80;
     public float m_MoveSpeed = 1;
 	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
@@ -33,7 +44,6 @@ public class Nemesis : MonoBehaviour {
 	public float m_BeamRepel = 1.0f;
 	public float m_BlastStunTime = 0.125f;
 	public float m_BlastRepel = 1.0f;
-    public float m_StepRate = 1.0f;
     public float m_MaxEnergy = 83f;
     public float m_RushSuckPerSecond = 15;  //Coût du rush
     public float m_RotationSpeed = 400;
@@ -55,7 +65,6 @@ public class Nemesis : MonoBehaviour {
 	public GameObject m_SneakMesh;
 	public GameObject m_NormaMesh;
 
-    public AudioSource m_StepSource;
     
 	//walking part
 	//private bool m_CanJump = false;
@@ -100,19 +109,17 @@ public class Nemesis : MonoBehaviour {
         {
             Debug.LogError("No stun light 2D attached to lightguy !");
         }
-        else
-        {
-            m_RushLight.gameObject.SetActive(false);
-			m_DrainingLight.gameObject.SetActive(false);
-			m_SneakMesh.gameObject.SetActive(false);
-            
-	        m_StunTimer = 0;
-			m_RushTimer = 0;
-	        m_PlayStepSoundTimer = 1;
-			m_LastPosition = new Vector2(transform.position.x, transform.position.y);
-	        m_Energy = m_MaxEnergy;
-        }
 
+	    m_RushLight.gameObject.SetActive(false);
+		m_DrainingLight.gameObject.SetActive(false);
+		m_SneakMesh.gameObject.SetActive(false);
+    
+        m_StunTimer = 0;
+		m_RushTimer = 0;
+        m_PlayStepSoundTimer = 1;
+		m_LastPosition = new Vector2(transform.position.x, transform.position.y);
+        m_Energy = m_MaxEnergy;
+		
 		//if (m_Flying)
 		m_RigidBody.gravityScale = 0;
 
@@ -275,15 +282,19 @@ public class Nemesis : MonoBehaviour {
 			Vector2 delta = new Vector2(currentPosition.x - m_LastPosition.x,
 			                            currentPosition.y - m_LastPosition.y);
 			float velocity = delta.magnitude / Time.deltaTime;
-			if (Mathf.Abs(velocity) > 0.1)
+			if (Mathf.Abs(velocity) >= m_MinStepSpeed)
 			{
+				float t = (velocity - m_MinStepSpeed) / (m_MaxStepSpeed - m_MinStepSpeed);
 				if (m_PlayStepSoundTimer > 0)
 				{
-					m_PlayStepSoundTimer -= Time.deltaTime * velocity * m_StepRate;
+					t *= t; // frequency should be low most of the time
+					m_PlayStepSoundTimer -= Time.deltaTime * Mathf.Lerp(m_MinStepFrequency, m_MaxStepFrequency, t);
 				}
 				else
 				{
 					m_PlayStepSoundTimer = 1;
+					//t = Mathf.Sqrt(t); // volume should be high most of the time
+					m_StepSource.volume = Mathf.Lerp(m_MinStepVolume, m_MaxStepVolume, t);
 					m_StepSource.pitch = 1 + Random.Range(-0.1f, 0.1f);
 					m_StepSource.Play();
 				}
