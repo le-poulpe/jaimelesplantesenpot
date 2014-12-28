@@ -16,8 +16,9 @@ public class LightGuy : MonoBehaviour {
 
     public GameObject m_Cursor;
 	private bool m_AttackingNemesis = false;
-
-    public float m_JumpImpulse = 35;
+	
+	public float m_JumpImpulse = 35;
+	public float m_JumpImpulseX = 5;
 	public float m_LadderJumpImpulse = 18;
     public float m_MoveSpeed = 1;
     public float m_MaxEnergy = 100;
@@ -210,7 +211,7 @@ public class LightGuy : MonoBehaviour {
                 if ((Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown("space")) && m_CanJump)
                 {
                     m_CanJump = false;
-                    m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
+					m_RigidBody.AddForce(new Vector2(axisValueX * m_JumpImpulseX, m_JumpImpulse), ForceMode2D.Impulse);
                 }
 
             }
