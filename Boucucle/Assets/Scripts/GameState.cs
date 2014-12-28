@@ -119,8 +119,6 @@ public class GameState : MonoBehaviour {
 					m_ScoreP2 += 3;
 					UpdateScore();
 				}
-				else if (m_Nemesis.IsDead())
-					SetGameState(E_GameState.GM_LIGHT_WIN);
 				else if (potsdeFleur.Length == 0)				
 					SetGameState(E_GameState.GM_LIGHT_WIN);
 				break;

@@ -13,18 +13,14 @@ public class Nemesis : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
-    private bool m_CanJump = false;
     private float m_StunTimer;
     private float m_PlayStepSoundTimer;
-    private float m_PlayGruntSoundTimer;
 	private Vector3	m_LastPosition;
     private float m_Energy;
-    private bool m_IsOnLadder = false;
 	private E_NemState m_State;
 	private float m_CurrentSpeed;
 
     public float m_EnergySuckPerSecond = 80;
-    public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
 	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
 	public float m_SneakSpeed = 0.3f;
@@ -33,13 +29,9 @@ public class Nemesis : MonoBehaviour {
 	public float m_BlastStunTime = 0.125f;
 	public float m_BlastRepel = 1.0f;
     public float m_StepRate = 1.0f;
-    public float m_GruntRate = 1.0f;
     public float m_MaxEnergy = 83f;
-    public float m_EnergyLossPerSecond = 0.1f;
     public float m_RushSuckPerSecond = 15;  //Coût du rush
-    public float m_StartGruntingEnergy = 30;
     public float m_RotationSpeed = 400;
-    public float m_LadderClimbSpeed = 1;
     public float m_MeshRotateSpeed1 = 1;
     public float m_MeshRotateSpeed2 = 1;
     public float m_MeshRotateSpeed3 = 1;
@@ -60,18 +52,31 @@ public class Nemesis : MonoBehaviour {
 	public GameObject m_NormaMesh;
 
     public AudioSource m_StepSource;
-    public AudioSource m_GruntSource;
-	
+    
+	//walking part
+	//private bool m_CanJump = false;
+	//private bool m_IsOnLadder = false;
+	//public float m_LadderClimbSpeed = 1;
+	//public float m_JumpImpulse = 5;
+
+	//energy part
+	//public AudioSource m_GruntSource;
+	//public float m_StartGruntingEnergy = 30;
+	//public float m_GruntRate = 1.0f;
+	//public float m_EnergyLossPerSecond = 0.1f;
+	//private float m_PlayGruntSoundTimer;
+
+	/* energy considerations disabled for nemesis
 	public bool IsDead()
 	{
 		return m_Energy <= 0;
-	}
+	}*/
 
 	// Use this for initialization
 	void Start () {
         m_RigidBody = this.rigidbody2D;
         m_Collider = GetComponentInChildren<Collider2D>();
-        m_CanJump = false;
+        //m_CanJump = false; jump disabled
 		m_State = E_NemState.NS_NORMAL;
 		m_CurrentSpeed = m_MoveSpeed;
         if (m_RigidBody == null)
@@ -124,9 +129,8 @@ public class Nemesis : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate ()
     {
-        //m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
-
-        m_CanJump = false;
+		//m_Energy -= m_EnergyLossPerSecond * Time.deltaTime; energy considerations disabled for nemesis
+		/*m_CanJump = false; jump disabled
         Collider2D[] jumpColliders = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
                                              m_Collider.transform.position + new Vector3(0.2f, -m_Collider.bounds.extents.y + 0.1f, 0));
         foreach (Collider2D col in jumpColliders)
@@ -136,7 +140,7 @@ public class Nemesis : MonoBehaviour {
                 m_CanJump = true;
                 break;
             }
-        }
+        }*/
 
         m_MeshRotate1.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1, Time.deltaTime * m_MeshRotateSpeed1));
         m_MeshRotate2.transform.Rotate(new Vector3(Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2, Time.deltaTime * m_MeshRotateSpeed2));
@@ -147,7 +151,6 @@ public class Nemesis : MonoBehaviour {
         
 		if (m_Energy > 0)
         {	
-			LightGuy lightGuy = gameObject.GetComponentInParent<LightGuy>();
             if (m_StunTimer > 0)
 			{
 				m_StunLight.gameObject.SetActive(true);
@@ -166,7 +169,7 @@ public class Nemesis : MonoBehaviour {
 
 
 				bool rush = Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0;
-				bool sneak = Input.GetAxis("SneakP2Joy") > 0 || Input.GetAxis("SneakP2Keyboard") > 0;
+				bool sneak = Input.GetAxis("SneakP2Joy") > 0 || Input.GetAxis("SneakP2Keyboard") < 0;
 				//Rush
 				switch (m_State)
 				{
@@ -229,14 +232,15 @@ public class Nemesis : MonoBehaviour {
 							else
 							{
 								m_PlayStepSoundTimer = 1;
-								m_StepSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+								m_StepSource.pitch = 1 + Random.Range(-0.1f, 0.1f);
 								m_StepSource.Play();
 							}
 						}
 					}
 				}
-				/*else
+				/*else walking code disabled for nemesis
 				{
+					LightGuy lightGuy = gameObject.GetComponentInParent<LightGuy>();
 
 					// check ladder
 					bool collidesLadder = false;
@@ -322,7 +326,7 @@ public class Nemesis : MonoBehaviour {
 				}*/
             }
 
-            if (m_GruntSource != null)
+            /*if (m_GruntSource != null) energy code disabled for nemesis
             {
                 if (m_Energy < m_StartGruntingEnergy)
                 {
@@ -336,11 +340,11 @@ public class Nemesis : MonoBehaviour {
                     else
                     {
                         m_PlayGruntSoundTimer = 1;
-                        m_GruntSource.pitch = 1 + Random.RandomRange(-0.1f, 0.1f);
+                        m_GruntSource.pitch = 1 + Random.Range(-0.1f, 0.1f);
                         m_GruntSource.Play();
                     }
                 }
-            }
+            }*/
     
             m_LastPosition = new Vector2(transform.position.x, transform.position.y);
 
@@ -368,7 +372,7 @@ public class Nemesis : MonoBehaviour {
 
     public void Heal(float energy)
     {
-        m_Energy += energy;
+        //m_Energy += energy; energy code disabled for nemesis
     }
 
     public Collider2D GetCollider()
