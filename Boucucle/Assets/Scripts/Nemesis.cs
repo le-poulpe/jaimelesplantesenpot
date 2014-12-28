@@ -4,6 +4,13 @@ using System.Collections.Generic;
 
 public class Nemesis : MonoBehaviour {
 
+	enum E_NemState
+	{
+		NS_NORMAL,
+		NS_RUSH,
+		NS_SNEAK
+	};
+
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
     private bool m_CanJump = false;
@@ -12,14 +19,15 @@ public class Nemesis : MonoBehaviour {
     private float m_PlayGruntSoundTimer;
 	private Vector3	m_LastPosition;
     private float m_Energy;
-    private bool m_IsRushing = false;
     private bool m_IsOnLadder = false;
+	private E_NemState m_State;
+	private float m_CurrentSpeed;
 
     public float m_EnergySuckPerSecond = 80;
     public float m_JumpImpulse = 5;
     public float m_MoveSpeed = 1;
-    public float m_MoveSpeedPostRush = 1;   
 	public float m_RushSpeed = 1;   //Vitesse augmentée en rush
+	public float m_SneakSpeed = 0.3f;
 	public float m_StunTime = 1.0f;
 	public float m_BeamRepel = 1.0f;
 	public float m_BlastStunTime = 0.125f;
@@ -46,6 +54,8 @@ public class Nemesis : MonoBehaviour {
     public GameObject m_MeshRotate3;
     public GameObject m_MeshRotate4;
 	public GameObject m_MeshRotate5;
+	public GameObject m_SneakMesh;
+	public GameObject m_NormaMesh;
 
     public AudioSource m_StepSource;
     public AudioSource m_GruntSource;
@@ -60,6 +70,8 @@ public class Nemesis : MonoBehaviour {
         m_RigidBody = this.rigidbody2D;
         m_Collider = GetComponentInChildren<Collider2D>();
         m_CanJump = false;
+		m_State = E_NemState.NS_NORMAL;
+		m_CurrentSpeed = m_MoveSpeed;
         if (m_RigidBody == null)
         {
             Debug.LogError("No rigidbody 2D attached to nemesis !");
@@ -79,8 +91,8 @@ public class Nemesis : MonoBehaviour {
         else
         {
             m_RushLight.gameObject.SetActive(false);
-            m_DrainingLight.gameObject.SetActive(false);			
-            m_IsRushing = false;
+			m_DrainingLight.gameObject.SetActive(false);
+			m_SneakMesh.gameObject.SetActive(false);
             
 	        m_StunTimer = 0;
 	        m_PlayStepSoundTimer = 1;
@@ -148,32 +160,46 @@ public class Nemesis : MonoBehaviour {
 				float axisValueY = Input.GetAxis("VerticalP2Joy");
 				if (axisValueY == 0)
 					axisValueY = Input.GetAxis("VerticalP2Keyboard");
-                
-                //Rush
-				if (Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0) // xbox left trigger
-                {
-                    m_RushLight.gameObject.SetActive(true);
-                    m_IsRushing = true;
-                }
-                
-                else
-                {
-                    m_RushLight.gameObject.SetActive(false);
-                    m_IsRushing = false;
-                }                
-                
-                if (m_IsRushing)
-                {
-                    float loss = m_RushSuckPerSecond * Time.deltaTime;
-                    //m_Energy -= loss;
-                    m_MoveSpeed = m_RushSpeed;
-                }
-                else
-                {
-                    m_RushLight.gameObject.SetActive(false);
-                    m_IsRushing = false;
-                    m_MoveSpeed = m_MoveSpeedPostRush;
-                }
+
+
+				bool rush = Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0;
+				bool sneak = Input.GetAxis("SneakP2Joy") < 0 || Input.GetAxis("SneakP2Keyboard") < 0;
+				//Rush
+				switch (m_State)
+				{
+				case E_NemState.NS_NORMAL:
+					if (rush)
+					{
+						m_RushLight.gameObject.SetActive(true);
+						m_State = E_NemState.NS_RUSH;
+					}
+					else if (sneak)
+					{
+						m_NormaMesh.gameObject.SetActive(false);
+						m_SneakMesh.gameObject.SetActive(true);
+						m_State = E_NemState.NS_SNEAK;
+					}
+					break;
+				case E_NemState.NS_RUSH:
+					m_CurrentSpeed = m_RushSpeed;
+					if (!rush)
+					{
+						m_RushLight.gameObject.SetActive(false);
+						m_CurrentSpeed = m_MoveSpeed;
+						m_State = E_NemState.NS_NORMAL;
+					}
+					break;
+				case E_NemState.NS_SNEAK:
+					m_CurrentSpeed = m_SneakSpeed;
+					if (!sneak)
+					{
+						m_NormaMesh.gameObject.SetActive(true);
+						m_SneakMesh.gameObject.SetActive(false);
+						m_State = E_NemState.NS_NORMAL;
+						m_CurrentSpeed = m_MoveSpeed;
+					}
+					break;
+				}
 
 				if (m_Flying)
 				{
@@ -181,7 +207,7 @@ public class Nemesis : MonoBehaviour {
 					{
 						if (axisValueX != 0)
 							m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
-						m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, -axisValueY * m_MoveSpeed), ForceMode2D.Impulse);
+						m_RigidBody.AddForce(new Vector2(axisValueX * m_CurrentSpeed, -axisValueY * m_CurrentSpeed), ForceMode2D.Impulse);
 					}
 					
 					// footstep sound
@@ -206,7 +232,7 @@ public class Nemesis : MonoBehaviour {
 						}
 					}
 				}
-				else
+				/*else
 				{
 
 					// check ladder
@@ -290,7 +316,7 @@ public class Nemesis : MonoBehaviour {
 							m_RigidBody.AddForce(new Vector2(0, m_JumpImpulse), ForceMode2D.Impulse);
 						}
 					}
-				}
+				}*/
             }
 
             if (m_GruntSource != null)

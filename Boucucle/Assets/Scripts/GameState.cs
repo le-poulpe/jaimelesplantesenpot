@@ -39,7 +39,7 @@ public class GameState : MonoBehaviour {
         }
         else
 		{
-			if (m_ScoreP1 > 12 || m_ScoreP2 > 12)
+			if (m_ScoreP1 >= 12 || m_ScoreP2 >= 12)
 			{
 				m_ScoreP1 = m_ScoreP2 = 0;
 			}
