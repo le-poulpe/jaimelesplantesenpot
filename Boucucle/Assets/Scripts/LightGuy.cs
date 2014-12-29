@@ -223,15 +223,11 @@ public class LightGuy : MonoBehaviour {
 
 			m_JumpButtonPressed = jump;
 			
-			m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
+			if (axisValueX != 0 || axisValueY != 0)
+				m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
 
 			if (m_Cursor != null)
-			{
-				if (axisValueX != 0 || axisValueY != 0)
-				{
-					m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
-				}
-			}
+				m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
 			
 			//Blast
 			if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
