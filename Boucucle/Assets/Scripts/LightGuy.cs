@@ -40,6 +40,9 @@ public class LightGuy : MonoBehaviour {
     public float m_MinAuraIntensity = 0;
     public float m_MaxAuraIntensity = 2;
 
+	Color m_BlastStartColor;
+	public float m_BlastAttenuationFactor = 5;
+
 	public bool IsDead()
 	{
 		return m_Energy <= 0;
@@ -97,6 +100,8 @@ public class LightGuy : MonoBehaviour {
             m_Shoot.gameObject.SetActive(false);
             m_IsShooting = false;
         }
+
+		m_BlastStartColor = m_BlastLight.color;
 
 	}
 
@@ -274,6 +279,13 @@ public class LightGuy : MonoBehaviour {
 			{
 				float loss = m_BlastSuckPerSecond * Time.deltaTime;
 				m_Energy -= loss;
+
+				float t = (m_MaxEnergy - m_Energy) / m_MaxEnergy;
+				Color newColor = new Color();
+				newColor.r = Mathf.Lerp(m_BlastStartColor.r, m_BlastStartColor.r / m_BlastAttenuationFactor, t);
+				newColor.g = Mathf.Lerp(m_BlastStartColor.g, m_BlastStartColor.g / m_BlastAttenuationFactor, t);
+				newColor.b = Mathf.Lerp(m_BlastStartColor.b, m_BlastStartColor.b / m_BlastAttenuationFactor, t);
+				m_BlastLight.color = newColor;
 				
 				//nemesis sucks light if touched by blast
 				Vector2 delta = m_Nemesis.transform.position - this.transform.position;
