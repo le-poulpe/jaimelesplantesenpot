@@ -65,8 +65,9 @@ public class Nemesis : MonoBehaviour {
 	public GameObject m_MeshRotate4;
 	public GameObject m_MeshRotate5;
 	public GameObject m_MeshRotate6;
-	public GameObject m_SneakMesh;
-	public GameObject m_NormaMesh;
+	public GameObject m_SneakMesh = null;
+	public AudioSource m_SneakSound = null;
+	public GameObject m_NormaMesh = null;
 
     
 	//walking part
@@ -120,6 +121,8 @@ public class Nemesis : MonoBehaviour {
 	    m_RushLight.gameObject.SetActive(false);
 		m_DrainingLight.gameObject.SetActive(false);
 		m_SneakMesh.gameObject.SetActive(false);
+		m_StunLight.gameObject.SetActive(false);
+		m_StunShockSound.gameObject.SetActive(false);
     
         m_StunTimer = 0;
 		m_RushTimer = 0;
@@ -224,6 +227,7 @@ public class Nemesis : MonoBehaviour {
 				{
 					m_NormaMesh.gameObject.SetActive(false);
 					m_SneakMesh.gameObject.SetActive(true);
+					m_SneakSound.Play();
 					m_State = E_NemState.NS_SNEAK;
 				}
 				UpdateMove(axisValueX, axisValueY);
