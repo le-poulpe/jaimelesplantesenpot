@@ -6,14 +6,19 @@ public class LightGuy : MonoBehaviour {
 
     private Rigidbody2D m_RigidBody;
     private Collider2D m_Collider;
-    private bool m_CanJump = false;
+    private bool m_IsOnGround = false; // DO NOT SET DIRECTLY ! use SetOnGround
+	private bool m_CanJump = false; // like m_IsOnGround, but more tolerant
     private Nemesis m_Nemesis;
     private float m_Energy;
     private bool m_IsBlasting = false;
     private bool m_IsShooting = false;
     private float m_ShootAngle = 0f;
     private bool m_IsOnLadder = false;
-	private bool m_JumpButtonPressed = false; // used to debug a weird bug where Input.GetKeyDown returns true two frames in a row...
+	private bool m_JumpButtonPressed = false; // used to communicate between Update and FixedUpdate
+	private float m_Gravity;
+	
+	private float m_AxisValueX;
+	private float m_AxisValueY;
 
     public GameObject m_Cursor;
 	private bool m_AttackingNemesis = false;
@@ -27,7 +32,6 @@ public class LightGuy : MonoBehaviour {
     public float m_BlastSuckPerSecond = 15;
 	public float m_BlastStunRange = 3.0f;
     public float m_ShootSuckPerSecond = 10;
-    public float m_RotationSpeed = 400f;
     public float m_LadderClimbSpeed = 1;
 	public float m_BlastStunDistance = 1.25f;
 	public AudioSource m_DisappearSound = null;
@@ -52,7 +56,6 @@ public class LightGuy : MonoBehaviour {
 	void Start () {
         m_RigidBody = this.rigidbody2D;
         m_Collider = GetComponentInChildren<Collider2D>();
-        m_CanJump = false;
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
@@ -101,7 +104,10 @@ public class LightGuy : MonoBehaviour {
             m_IsShooting = false;
         }
 
+		m_AxisValueX = m_AxisValueY = 0;
 		m_BlastStartColor = m_BlastLight.color;
+		m_Gravity = m_RigidBody.gravityScale;
+		SetOnGround(false);
 
 	}
 
@@ -123,171 +129,82 @@ public class LightGuy : MonoBehaviour {
         if (nemesis != null)
             m_AttackingNemesis = false;
     }
-	
-	// Update is called once per frame
-	void FixedUpdate ()
-    {
-        m_CanJump = false;
-        Collider2D[] jumpColliders = Physics2D.OverlapAreaAll(m_Collider.transform.position + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
-                                             m_Collider.transform.position + new Vector3( 0.2f, -m_Collider.bounds.extents.y + 0.1f, 0));
-        foreach (Collider2D col in jumpColliders)
-        {
-            if (col != m_Collider && !col.isTrigger)
-            {
-                m_CanJump = true;
-                break;
-            }
-        }
-		
-		if (m_Energy > 1 && m_Energy < 13.5)
+
+	void FixedUpdate()
+	{
+		// only physics-related stuff here
+		bool jumpPressedEvent = false;
+		if (m_JumpButtonPressed)
 		{
-			m_DyingLightGuyFeedback.gameObject.SetActive(true);
-		}
-		else
-		{
-			m_DyingLightGuyFeedback.gameObject.SetActive(false);
+			m_JumpButtonPressed = false;
+			jumpPressedEvent = true;
 		}
 		
-        if (m_Energy > 0)
-        {
-            // update controls
-            float axisValueX = Input.GetAxis("HorizontalP1Joy");
-			if (axisValueX == 0)
-				axisValueX = Input.GetAxis("HorizontalP1Keyboard");
-			float axisValueY = Input.GetAxis("VerticalP1Joy");
-			if (axisValueY == 0)
-				axisValueY = Input.GetAxis("VerticalP1Keyboard");
-			
-			bool jumpJoy = Input.GetKeyDown(KeyCode.Joystick1Button0);
-			bool jumpKey = Input.GetKeyDown("space");
-			bool jump = jumpJoy || jumpKey;
+		//check if on ground
+		SetOnGround(false);
+		{
+			Collider2D[] groundColliders = Physics2D.OverlapAreaAll(m_Collider.bounds.center + new Vector3(-0.2f, -m_Collider.bounds.extents.y - 0.1f, 0),
+			                                                        m_Collider.bounds.center + new Vector3( 0.2f, 0, 0));
+	        foreach (Collider2D col in groundColliders)
+	        {
+	            if (col != m_Collider && !col.isTrigger)
+	            {
+					SetOnGround(true);
+					break;
+	            }
+	        }
+		}
 
-            // check ladder
-            bool collidesLadder = false;
-            Collider2D[] ladderColliders = Physics2D.OverlapAreaAll(new Vector2(transform.position.x-0.2f, transform.position.y - 0.2f),
-			                                                        new Vector2(transform.position.x+0.2f, transform.position.y + 0.2f));
-            GameObject ladder = null;
-
-            for (int i = 0; i < ladderColliders.Length; ++i)
-            {
-                if (ladderColliders[i].gameObject.tag.Equals("Ladder"))
-                {
-                    collidesLadder = true;
-                    ladder = ladderColliders[i].gameObject;
-                    break;
-                }
-            }
-            if (collidesLadder && !m_IsOnLadder)
-            {
-                if (axisValueY < -0.5 && Mathf.Abs(axisValueX) < 0.5 && !m_IsBlasting && !m_IsShooting)
-                {
-                    //up near a ladder : get on ladder
-                    m_IsOnLadder = true;
-                    m_RigidBody.isKinematic = true;
-					transform.position = new Vector3(ladder.transform.position.x, transform.position.y, transform.position.z);
-                }
-            }
-            else if (!collidesLadder && m_IsOnLadder)
-            {
-                m_RigidBody.isKinematic = false;
-                m_IsOnLadder = false;
-            }
-
-            if (m_IsOnLadder)
-            {
-                // Jump
-                if (jump && !m_JumpButtonPressed)
-                {
-                    m_IsOnLadder = false;
-					m_RigidBody.isKinematic = false;
-					m_RigidBody.AddForce(new Vector2(m_LadderJumpImpulse * axisValueX, -m_LadderJumpImpulse * axisValueY), ForceMode2D.Impulse);
-                }
-                else
-                {
-                    Vector3 toAdd = new Vector3(0, -axisValueY * Time.deltaTime * m_LadderClimbSpeed, 0);
-                    transform.position = transform.position + toAdd;
-                }
-            }
-            else
-            {
-                if (axisValueX != 0 || axisValueY != 0)
-                {
-                    m_Collider.transform.Rotate(new Vector3(0, 0, 1), axisValueX * -m_RotationSpeed * Time.deltaTime);
-                }
-
-                m_RigidBody.AddForce(new Vector2(axisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
-
-				// Jump
-				if (jump && !m_JumpButtonPressed && m_CanJump)
-                {
-                    m_CanJump = false;
-					m_RigidBody.AddForce(new Vector2(axisValueX * m_JumpImpulseX, m_JumpImpulse), ForceMode2D.Impulse);
-                }
-
-            }
-
-			m_JumpButtonPressed = jump;
-			
-			if (axisValueX != 0 || axisValueY != 0)
-				m_ShootAngle = Mathf.Atan2(-axisValueY, axisValueX) * 180 / Mathf.PI;
-
-			if (m_Cursor != null)
-				m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
-			
-			//Blast
-			if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
+		// check if can jump. Need to separate canJump and isOnGround to be more tolerant because gravity is disabled when on ground.
+		m_CanJump = IsOnGround();
+		if (!m_CanJump)
+		{
+			// same check as above, but more tolerant
+			Collider2D[] groundColliders = Physics2D.OverlapAreaAll(m_Collider.bounds.center + new Vector3(-0.4f, -m_Collider.bounds.extents.y - 0.4f, 0),
+			                                                        m_Collider.bounds.center + new Vector3( 0.4f, 0, 0));
+			foreach (Collider2D col in groundColliders)
 			{
-				m_BlastLight.gameObject.SetActive(true);
-				m_IsBlasting = true;
+				if (col != m_Collider && !col.isTrigger)
+				{
+					m_CanJump = true;
+					break;
+				}
+			}
+		}
+
+		if (!IsDead())
+		{
+			if (m_IsOnLadder)
+			{
+				// Jump
+				if (jumpPressedEvent)
+				{
+					m_IsOnLadder = false;
+					m_RigidBody.isKinematic = false;
+					m_RigidBody.AddForce(new Vector2(m_LadderJumpImpulse * m_AxisValueX, -m_LadderJumpImpulse * m_AxisValueY), ForceMode2D.Impulse);
+				}
+				else
+				{
+					Vector3 toAdd = new Vector3(0, -m_AxisValueY * Time.fixedDeltaTime * m_LadderClimbSpeed, 0);
+					transform.position = transform.position + toAdd;
+					Debug.Log("y " + -m_AxisValueY + " add " + toAdd.y);
+				}
 			}
 			else
 			{
-				m_BlastLight.gameObject.SetActive(false);
-				m_IsBlasting = false;
+				//move left/right
+				m_RigidBody.AddForce(new Vector2(m_AxisValueX * m_MoveSpeed, 0), ForceMode2D.Impulse);
+				
+				// Jump
+				if (jumpPressedEvent && m_CanJump)
+				{
+					m_RigidBody.AddForce(new Vector2(m_AxisValueX * m_JumpImpulseX, m_JumpImpulse), ForceMode2D.Impulse);
+				}
 			}
-			
-			//Shoot
-			if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
-			{
-				m_Shoot.gameObject.SetActive(true);
-				m_IsShooting = true;
-			}
-			else if (Input.GetKeyUp(KeyCode.Joystick1Button2) || Input.GetKeyUp("left shift"))
-			{
-				m_Shoot.gameObject.SetActive(false);
-				m_IsShooting = false;
-			}
-			
-			
-			// update light
-			if (m_AuraLight != null)
-				m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
-			
-			// die slowly
-			m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
-			
-			// die less slowly if in contact with nemesis
-			if (m_AttackingNemesis)
-			{
-				float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
-				m_Energy -= loss;
-				m_Nemesis.Heal(loss);	
-			}
-			
-			// die less slowly if blasting
+
 			if (m_IsBlasting)
 			{
-				float loss = m_BlastSuckPerSecond * Time.deltaTime;
-				m_Energy -= loss;
-
-				float t = (m_MaxEnergy - m_Energy) / m_MaxEnergy;
-				Color newColor = new Color();
-				newColor.r = Mathf.Lerp(m_BlastStartColor.r, m_BlastStartColor.r / m_BlastAttenuationFactor, t);
-				newColor.g = Mathf.Lerp(m_BlastStartColor.g, m_BlastStartColor.g / m_BlastAttenuationFactor, t);
-				newColor.b = Mathf.Lerp(m_BlastStartColor.b, m_BlastStartColor.b / m_BlastAttenuationFactor, t);
-				m_BlastLight.color = newColor;
-				
-				//nemesis sucks light if touched by blast
+				//nemesis stun if touched by blast
 				Vector2 delta = m_Nemesis.transform.position - this.transform.position;
 				if (delta.magnitude < m_BlastStunDistance)
 				{
@@ -322,9 +239,6 @@ public class LightGuy : MonoBehaviour {
 			// die less slowly if shooting
 			if (m_IsShooting)
 			{
-				float loss = m_ShootSuckPerSecond * Time.deltaTime;
-				m_Energy -= loss;
-				m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
 				LaserBeam beam = m_Shoot.GetComponentInChildren<LaserBeam>();
 				if (beam != null)
 				{
@@ -335,12 +249,148 @@ public class LightGuy : MonoBehaviour {
 						if (nemesis != null)
 						{
 							nemesis.Stun();
-							nemesis.Repel(beam.GetDir());
-							nemesis.Heal(loss);													
+							nemesis.Repel(beam.GetDir());									
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	void Update ()
+	{
+		// update controls
+		m_AxisValueX = Input.GetAxis("HorizontalP1Joy");
+		if (m_AxisValueX == 0)
+			m_AxisValueX = Input.GetAxis("HorizontalP1Keyboard");
+		m_AxisValueY = Input.GetAxis("VerticalP1Joy");
+		if (m_AxisValueY == 0)
+			m_AxisValueY = Input.GetAxis("VerticalP1Keyboard");
+		
+		bool jumpJoy = Input.GetKeyDown(KeyCode.Joystick1Button0);
+		bool jumpKey = Input.GetKeyDown("space");
+		bool jump = jumpJoy || jumpKey;
+		if (jump)
+			m_JumpButtonPressed = true; // communicate to physics update to jump
+
+		if (m_Energy > 1 && m_Energy < 13.5)
+		{
+			m_DyingLightGuyFeedback.gameObject.SetActive(true);
+		}
+		else
+		{
+			m_DyingLightGuyFeedback.gameObject.SetActive(false);
+		}
+		
+        if (!IsDead())
+        {
+            // check ladder
+            bool collidesLadder = false;
+            Collider2D[] ladderColliders = Physics2D.OverlapAreaAll(new Vector2(transform.position.x-0.2f, transform.position.y - 0.2f),
+			                                                        new Vector2(transform.position.x+0.2f, transform.position.y + 0.2f));
+            GameObject ladder = null;
+
+            for (int i = 0; i < ladderColliders.Length; ++i)
+            {
+                if (ladderColliders[i].gameObject.tag.Equals("Ladder"))
+                {
+                    collidesLadder = true;
+                    ladder = ladderColliders[i].gameObject;
+                    break;
+                }
+            }
+            if (collidesLadder && !m_IsOnLadder)
+            {
+                if (m_AxisValueY < -0.5 && Mathf.Abs(m_AxisValueX) < 0.5 && !m_IsBlasting && !m_IsShooting)
+                {
+                    //up near a ladder : get on ladder
+                    m_IsOnLadder = true;
+                    m_RigidBody.isKinematic = true;
+					transform.position = new Vector3(ladder.transform.position.x, transform.position.y, transform.position.z);
+                }
+            }
+            else if (!collidesLadder && m_IsOnLadder)
+            {
+                m_RigidBody.isKinematic = false;
+                m_IsOnLadder = false;
+            }
+			
+			if (m_AxisValueX != 0 || m_AxisValueY != 0)
+				m_ShootAngle = Mathf.Atan2(-m_AxisValueY, m_AxisValueX) * 180 / Mathf.PI;
+
+			if (m_Cursor != null)
+				m_Cursor.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
+			
+			//Blast
+			if (Input.GetAxis("BlastP1Joy") < 0 || Input.GetAxis("BlastP1Keyboard") < 0) // xbox left trigger
+			{
+				m_BlastLight.gameObject.SetActive(true);
+				m_IsBlasting = true;
+			}
+			else
+			{
+				m_BlastLight.gameObject.SetActive(false);
+				m_IsBlasting = false;
+			}
+			
+			//Shoot
+			if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
+			{
+				m_Shoot.gameObject.SetActive(true);
+				m_IsShooting = true;
+			}
+			else if (Input.GetKeyUp(KeyCode.Joystick1Button2) || Input.GetKeyUp("left shift"))
+			{
+				m_Shoot.gameObject.SetActive(false);
+				m_IsShooting = false;
+			}
+			
+			// update light
+			if (m_AuraLight != null)
+				m_AuraLight.intensity = Mathf.Lerp(m_MinAuraIntensity, m_MaxAuraIntensity, m_Energy / m_MaxEnergy);
+			
+			// die slowly
+			m_Energy -= m_EnergyLossPerSecond * Time.deltaTime;
+			
+			// die less slowly if in contact with nemesis
+			if (m_AttackingNemesis)
+			{
+				float loss = m_Nemesis.m_EnergySuckPerSecond * Time.deltaTime;
+				m_Energy -= loss;
+				m_Nemesis.Heal(loss);	
+			}
+			
+			if (m_IsBlasting)
+			{
+				float loss = m_BlastSuckPerSecond * Time.fixedDeltaTime;
+				m_Energy -= loss;
+				
+				float t = (m_MaxEnergy - m_Energy) / m_MaxEnergy;
+				Color newColor = new Color();
+				newColor.r = Mathf.Lerp(m_BlastStartColor.r, m_BlastStartColor.r / m_BlastAttenuationFactor, t);
+				newColor.g = Mathf.Lerp(m_BlastStartColor.g, m_BlastStartColor.g / m_BlastAttenuationFactor, t);
+				newColor.b = Mathf.Lerp(m_BlastStartColor.b, m_BlastStartColor.b / m_BlastAttenuationFactor, t);
+				m_BlastLight.color = newColor;
+			}
+			
+			// die less slowly if shooting
+			if (m_IsShooting)
+			{
+				float loss = m_ShootSuckPerSecond * Time.deltaTime;
+				m_Energy -= loss;
+				m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle));
+			}
         }
+	}
+
+	void SetOnGround(bool isOnGround)
+	{
+		m_IsOnGround = isOnGround;
+		m_RigidBody.gravityScale = m_IsOnGround ? 0 : m_Gravity;
+	}
+
+	bool IsOnGround()
+	{
+		return m_IsOnGround;
 	}
 }
