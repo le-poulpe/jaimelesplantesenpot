@@ -187,7 +187,6 @@ public class LightGuy : MonoBehaviour {
 				{
 					Vector3 toAdd = new Vector3(0, -m_AxisValueY * Time.fixedDeltaTime * m_LadderClimbSpeed, 0);
 					transform.position = transform.position + toAdd;
-					Debug.Log("y " + -m_AxisValueY + " add " + toAdd.y);
 				}
 			}
 			else
