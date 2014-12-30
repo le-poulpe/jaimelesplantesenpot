@@ -146,6 +146,11 @@ public class GameState : MonoBehaviour {
 
     void Update()
     {
+		// exit
+		if (Input.GetKeyDown(KeyCode.Escape))
+			Application.Quit();
+
+
         switch (m_GameState)
         {
             case E_GameState.GM_TITLE:
