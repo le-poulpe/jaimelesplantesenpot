@@ -25,7 +25,8 @@ public class LightGuy : MonoBehaviour {
 	
 	public float m_JumpImpulse = 35;
 	public float m_JumpImpulseX = 5;
-	public float m_LadderJumpImpulse = 18;
+	public float m_LadderJumpImpulse = 12;
+	public float m_LadderJumpImpulseX = 20;
     public float m_MoveSpeed = 1;
     public float m_MaxEnergy = 100;
     public float m_EnergyLossPerSecond = 0.1f;
@@ -182,7 +183,7 @@ public class LightGuy : MonoBehaviour {
 				{
 					m_IsOnLadder = false;
 					m_RigidBody.isKinematic = false;
-					m_RigidBody.AddForce(new Vector2(m_LadderJumpImpulse * m_AxisValueX, -m_LadderJumpImpulse * m_AxisValueY), ForceMode2D.Impulse);
+					m_RigidBody.AddForce(new Vector2((m_LadderJumpImpulseX + m_LadderJumpImpulse) * m_AxisValueX, -m_AxisValueY * m_LadderJumpImpulse), ForceMode2D.Impulse);
 				}
 				else
 				{
