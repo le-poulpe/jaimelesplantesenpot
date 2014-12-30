@@ -15,7 +15,9 @@ public class GameState : MonoBehaviour {
 	static bool m_Once = false;
 	static int m_ScoreP1 = 0;
 	static int m_ScoreP2 = 0;
-	
+	static private int[] m_ArenaOrder;
+	static private int	  m_CurrentArenaIndex;
+
 	private int m_NbPots;
 	private int m_BaseNbPots;
 
@@ -33,14 +35,45 @@ public class GameState : MonoBehaviour {
 	public int	      m_TargetScore = 12;
 	public int 		  m_KillLightGuyScore = 3;
 	public int[]	  m_PotScores;
+	public GameObject[] m_Arenas;
 
+
+	void ShuffleArenas()
+	{
+		for (int i = m_ArenaOrder.Length-1; i > 0 ; --i)
+		{
+			int j = Random.Range(0, i);
+			int tmp = m_ArenaOrder[j];
+			m_ArenaOrder[j] = m_ArenaOrder[i];
+			m_ArenaOrder[i] = tmp;
+		}
+	}
+	void SelectArena(int index)
+	{
+		int randomIndex = m_ArenaOrder[index];
+		for (int i = 0; i < m_Arenas.Length; ++i)
+		{
+			m_Arenas[i].SetActive(i == randomIndex);
+		}
+		m_Spawner = m_Arenas[randomIndex].GetComponentInChildren<Spawner>();
+	}
 
 	// Use this for initialization
 	void Start () {
-        m_Spawner = FindObjectOfType<Spawner>();
         if (!m_Once)
         {
             m_Once = true;
+			
+			//init arenas
+			{
+				m_CurrentArenaIndex = 0;
+				m_ArenaOrder = new int[m_Arenas.Length];
+				for (int i = 0; i < m_ArenaOrder.Length; ++i)
+					m_ArenaOrder[i] = i;
+				ShuffleArenas();
+				SelectArena(m_CurrentArenaIndex);
+			}
+
             SetGameState(E_GameState.GM_TITLE);
         }
         else
@@ -48,8 +81,19 @@ public class GameState : MonoBehaviour {
 			if (m_ScoreP1 >= m_TargetScore || m_ScoreP2 >= m_TargetScore)
 			{
 				m_ScoreP1 = m_ScoreP2 = 0;
+
+				// new arena !
+				{
+					++m_CurrentArenaIndex;
+					if (m_CurrentArenaIndex >= m_Arenas.Length)
+					{
+						m_CurrentArenaIndex = 0;
+						ShuffleArenas();
+					}
+				}
 			}
-	        SetGameState(E_GameState.GM_PLAY);
+			SelectArena(m_CurrentArenaIndex);
+			SetGameState(E_GameState.GM_PLAY);
 		}
 		UpdateScore();
 
