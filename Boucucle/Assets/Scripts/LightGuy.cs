@@ -140,7 +140,7 @@ public class LightGuy : MonoBehaviour {
             }
         }
 		
-		if (m_Energy > 0.1 && m_Energy < m_MaxEnergy * 0.24f)	//Stress inducing audio when LG is dying
+		if (m_Energy > 0.1 && m_Energy < m_MaxEnergy * 0.24f && m_AttackingNemesis == false)	//Stress inducing audio when LG is dying
 		{
 			m_DyingLightGuyFeedback.gameObject.SetActive(true);
 			m_DyingLightGuyFeedback.pitch = m_DyingFeedbackPitch - (m_Energy * 0.04f);
