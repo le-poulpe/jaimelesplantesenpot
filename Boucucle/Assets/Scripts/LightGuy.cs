@@ -34,12 +34,15 @@ public class LightGuy : MonoBehaviour {
     public float m_ShootSuckPerSecond = 10;
     public float m_LadderClimbSpeed = 1;
 	public float m_BlastStunDistance = 1.25f;
-	public AudioSource m_DisappearSound = null;
+	public float m_DyingFeedbackPitch = 0.45f;
+	public float m_DyingFeedbackVolume = 1;
+	public float m_FlowerPotHeal = 1;
+	
 
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
-	public GameObject m_GotPotFeedback = null;
-	public GameObject m_DyingLightGuyFeedback = null;
+	public AudioSource m_DyingLightGuyFeedback = null;
+	public AudioSource m_DisappearSound = null;
     public GameObject m_Shoot = null;
     public float m_MinAuraIntensity = 0;
     public float m_MaxAuraIntensity = 2;
@@ -59,7 +62,8 @@ public class LightGuy : MonoBehaviour {
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
-		m_GotPotFeedback.gameObject.SetActive(false);
+		m_DyingLightGuyFeedback.gameObject.SetActive(false);
+		m_DisappearSound.gameObject.SetActive(true);
 
         if (m_Nemesis == null)
         {
@@ -80,10 +84,6 @@ public class LightGuy : MonoBehaviour {
         if (m_BlastLight == null)
         {
             Debug.LogError("No blast light 2D attached to lightguy !");
-        }
-		if (m_GotPotFeedback == null)
-        {
-            Debug.LogError("No pot feedback object attached to lightguy !");
         }
 		if (m_DyingLightGuyFeedback == null)
         {
@@ -119,6 +119,7 @@ public class LightGuy : MonoBehaviour {
         else if (coll.gameObject.GetComponentInParent<PotDeFleur>() != null)
         {
 			Object.Destroy(coll.gameObject);
+			m_Energy = m_Energy + m_FlowerPotHeal;		//Small heal when LG get his hands on a flower pot 
 			m_DisappearSound.Play();
         }
     }
@@ -272,16 +273,18 @@ public class LightGuy : MonoBehaviour {
 			m_AxisValueX *= 0.70710678118654752440084436210485f;
 			m_AxisValueY *= 0.70710678118654752440084436210485f;
 		}
-		
+
 		bool jumpJoy = Input.GetKeyDown(KeyCode.Joystick1Button0);
 		bool jumpKey = Input.GetKeyDown("space");
 		bool jump = jumpJoy || jumpKey;
 		if (jump)
 			m_JumpButtonPressed = true; // communicate to physics update to jump
 
-		if (m_Energy > 1 && m_Energy < 13.5)
+		if (m_Energy > 0.1 && m_Energy < m_MaxEnergy * 0.24f && m_AttackingNemesis == false)	//Stress inducing audio when LG is dying
 		{
 			m_DyingLightGuyFeedback.gameObject.SetActive(true);
+			m_DyingLightGuyFeedback.pitch = m_DyingFeedbackPitch - (m_Energy * 0.04f);
+			m_DyingLightGuyFeedback.volume = m_DyingFeedbackVolume - (m_Energy * 0.08f);
 		}
 		else
 		{
