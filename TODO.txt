@@ -6,6 +6,15 @@ TODO (27-12)
 1 - Correction du beam qui considère un hit quoi qu'il arrive lors d'un tir suivant un hit véritable
 0.9 - Correction des contrôles
 1 - Faire que quand light guy arrive à 12 il gagne sans attendre la fin de la manche (aka la mort de light guy)
+0 - Feedback audio continu pendant le drain
+0.5 - Feedback audio signifiant la mort de LG
+0.9 - Augmentation de la puissance du blast (il a pas mal souffert avec ta modif sur la couleur variable) (au passage réduction de 15-20% de sa conso)
+0 - Objets pour arène à thème ("lampe de recharge", slope (escalier à descendre uniquement), etc) pour donner un peu plus de diversité.
+0 - Audio et écran spécifique pour les victoires de partie (à opposer aux victoires d'un simple round) et de manière générale rendre le démarrage des parties, les 	victoires, etc un peu plus cérémonieux
+0 - Améliorer la lisibilité/mise en valeur du score, pour le moment c'est pas très emballant de faire un triple pot autrement qu'intellectuellement
+0 - Musique pour la victoire d'un round pour LG
+0 - Voir ce que ça donne de lier DG aux pots en cas de prise (petit stun ? simple ouch ?) et en cas de collecte complète (destruction de DG ?)
+0.5 - Normalisation des niveaux de l'audio
 
 
 Brainstorm tard le soir :

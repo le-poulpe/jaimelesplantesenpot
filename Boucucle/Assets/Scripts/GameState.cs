@@ -20,6 +20,8 @@ public class GameState : MonoBehaviour {
 
 	private int m_NbPots;
 	private int m_BaseNbPots;
+	
+	public float m_EndGameTimer = 1.2f;
 
     LightGuy m_LightGuy = null;
     Nemesis m_Nemesis = null;
@@ -146,7 +148,8 @@ public class GameState : MonoBehaviour {
 
     void Update()
     {
-        switch (m_GameState)
+      
+		switch (m_GameState)
         {
             case E_GameState.GM_TITLE:
                 if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("space"))
@@ -168,11 +171,14 @@ public class GameState : MonoBehaviour {
 					UpdateScore();
 				}
 				else if (potsdeFleur.Length == 0 || m_ScoreP1 >= m_TargetScore)
+				{
 					SetGameState(E_GameState.GM_LIGHT_WIN);
+				}
 				break;
             case E_GameState.GM_LIGHT_WIN:
             case E_GameState.GM_NEM_WIN:
-                if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown("space"))
+				m_EndGameTimer -= 1 * Time.deltaTime;
+                if (Input.GetKeyDown(KeyCode.Joystick1Button0) && m_EndGameTimer < 0 || Input.GetKeyDown(KeyCode.Joystick2Button0) && m_EndGameTimer < 0 || Input.GetKeyDown("space") && m_EndGameTimer < 0)
                     Application.LoadLevel(0);
                 break;
         }

@@ -43,6 +43,7 @@ public class LightGuy : MonoBehaviour {
     public Light m_AuraLight = null;
     public Light m_BlastLight = null;
 	public AudioSource m_DyingLightGuyFeedback = null;
+	public AudioSource m_DeathLightGuyFeedback = null;
 	public AudioSource m_DisappearSound = null;
     public GameObject m_Shoot = null;
     public float m_MinAuraIntensity = 0;
@@ -63,7 +64,7 @@ public class LightGuy : MonoBehaviour {
         m_IsShooting = false;
         m_Energy = m_MaxEnergy;
         m_Nemesis = FindObjectOfType<Nemesis>();
-		m_DyingLightGuyFeedback.gameObject.SetActive(false);
+		m_DyingLightGuyFeedback.gameObject.SetActive(true);
 		m_DisappearSound.gameObject.SetActive(true);
 
         if (m_Nemesis == null)
@@ -89,6 +90,10 @@ public class LightGuy : MonoBehaviour {
 		if (m_DyingLightGuyFeedback == null)
         {
             Debug.LogError("No low energy feedback object attached to lightguy !");
+        }
+		if (m_DeathLightGuyFeedback == null)
+        {
+            Debug.LogError("No death feedback object attached to lightguy !");
         }
         else
         {
@@ -283,13 +288,23 @@ public class LightGuy : MonoBehaviour {
 
 		if (m_Energy > 0.1 && m_Energy < m_MaxEnergy * 0.24f && m_AttackingNemesis == false)	//Stress inducing audio when LG is dying
 		{
-			m_DyingLightGuyFeedback.gameObject.SetActive(true);
+			if (!m_DyingLightGuyFeedback.isPlaying)
+			{
+				m_DyingLightGuyFeedback.Play();
+			}
+			
 			m_DyingLightGuyFeedback.pitch = m_DyingFeedbackPitch - (m_Energy * 0.04f);
-			m_DyingLightGuyFeedback.volume = m_DyingFeedbackVolume - (m_Energy * 0.08f);
+			m_DyingLightGuyFeedback.volume = m_DyingFeedbackVolume - (m_Energy * 0.07f);
+			
+		}
+		else if (m_Energy <= 1)
+		{
+			m_DyingLightGuyFeedback.Stop();
+			m_DeathLightGuyFeedback.Play();
 		}
 		else
 		{
-			m_DyingLightGuyFeedback.gameObject.SetActive(false);
+			m_DyingLightGuyFeedback.Stop();
 		}
 		
         if (!IsDead())

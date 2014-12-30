@@ -55,8 +55,10 @@ public class Nemesis : MonoBehaviour {
 	public float m_MeshRotateSpeed4	= 1;
 	public float m_MeshRotateSpeed5	= 1;
 	public float m_MeshRotateSpeed6	= 1;
+	public float m_MeshRotateSpeed7	= 1;
 	public Light m_RushLight = null;
 	public Light m_StunLight = null;
+	public Light m_DeathLight = null;
 	public GameObject m_StunShockSound = null;
 	public GameObject m_DrainingLight = null;
     public GameObject m_MeshRotate1;
@@ -65,6 +67,7 @@ public class Nemesis : MonoBehaviour {
 	public GameObject m_MeshRotate4;
 	public GameObject m_MeshRotate5;
 	public GameObject m_MeshRotate6;
+	public GameObject m_MeshRotate7;
 	public GameObject m_SneakMesh = null;
 	public AudioSource m_SneakSound = null;
 	public GameObject m_NormaMesh = null;
@@ -116,6 +119,10 @@ public class Nemesis : MonoBehaviour {
 		if (m_StunShockSound == null)
         {
             Debug.LogError("No stun shock sound attached to nemesis !");
+        }
+		if (m_DeathLight == null)
+        {
+            Debug.LogError("No death light attached to nemesis !");
         }
 
 	    m_RushLight.gameObject.SetActive(false);
@@ -220,7 +227,7 @@ public class Nemesis : MonoBehaviour {
 					m_StunShockSound.gameObject.SetActive(false);
 				}
 			}
-			
+
 			//Rush
 			switch (m_State)
 			{
