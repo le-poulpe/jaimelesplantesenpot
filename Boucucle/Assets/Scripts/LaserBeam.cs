@@ -19,7 +19,6 @@ public class LaserBeam : MonoBehaviour
     int length;
     Vector3[] position;
     //Cache any transforms here
-    Transform myTransform;
     Transform endEffectTransform;
     //The particle system, in this case sparks which will be created by the Laser
     public ParticleSystem endEffect;
@@ -30,30 +29,35 @@ public class LaserBeam : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.SetWidth(laserWidth, laserWidth);
-        myTransform = transform;
-        offset = new Vector3(0, 0, 0);
-        endEffect = GetComponentInChildren<ParticleSystem>();
-        if (endEffect)
-            endEffectTransform = endEffect.transform;
-        m_HitObject = null;
+		InitLaser();
     }
+
+	void InitLaser()
+	{
+		lineRenderer = GetComponent<LineRenderer>();
+		lineRenderer.SetWidth(laserWidth, laserWidth);
+		offset = new Vector3(0, 0, 0);
+		endEffect = GetComponentInChildren<ParticleSystem>();
+		if (endEffect)
+			endEffectTransform = endEffect.transform;
+		m_HitObject = null;
+		RenderLaser();
+	}
+
+	void OnEnable()
+	{
+		InitLaser();
+	}
 
     // Update is called once per frame
     void Update()
     {
         RenderLaser();
-    }
-
-	void OnEnable()
-	{
-		m_HitObject = null;
 	}
 
 	public Vector2 GetDir()
 	{
-		return new Vector2 (myTransform.right.x, myTransform.right.y);
+		return new Vector2 (transform.right.x, transform.right.y);
 	}
 
     void RenderLaser()
@@ -67,8 +71,8 @@ public class LaserBeam : MonoBehaviour
         for (int i = 0; i < length; i++)
         {
             //Set the position here to the current location and project it in the forward direction of the object it is attached to
-            offset.x = myTransform.position.x + i * myTransform.right.x * texLength + Random.Range(-noise, noise);
-            offset.y = myTransform.position.y + i * myTransform.right.y * texLength + Random.Range(-noise, noise);
+            offset.x = transform.position.x + i * transform.right.x * texLength + Random.Range(-noise, noise);
+            offset.y = transform.position.y + i * transform.right.y * texLength + Random.Range(-noise, noise);
             position[i] = offset;
 
             lineRenderer.SetPosition(i, position[i]);
@@ -84,7 +88,7 @@ public class LaserBeam : MonoBehaviour
         //Raycast from the location of the cube forwards
         m_HitObject = null;
         RaycastHit2D[] hit;
-        hit = Physics2D.RaycastAll(myTransform.position, myTransform.right, maxLength);
+        hit = Physics2D.RaycastAll(transform.position, transform.right, maxLength);
         int i = 0;
         while (i < hit.Length)
         {
@@ -92,7 +96,7 @@ public class LaserBeam : MonoBehaviour
             if (!hit[i].collider.isTrigger)
             {
                 Vector2 point = new Vector2(hit[i].point.x, hit[i].point.y);
-                point -= new Vector2(myTransform.position.x, myTransform.position.y);
+                point -= new Vector2(transform.position.x, transform.position.y);
                 length = (int)Mathf.Round(point.magnitude / texLength) + 2;
                 m_HitObject = hit[i].collider.gameObject;
                 position = new Vector3[length];

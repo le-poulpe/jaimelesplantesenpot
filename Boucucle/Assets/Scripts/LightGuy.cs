@@ -346,6 +346,7 @@ public class LightGuy : MonoBehaviour {
 			//Shoot
 			if (Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown("left shift"))
 			{
+				m_Shoot.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_ShootAngle)); // yes, necessary here too
 				m_Shoot.gameObject.SetActive(true);
 				m_IsShooting = true;
 			}
