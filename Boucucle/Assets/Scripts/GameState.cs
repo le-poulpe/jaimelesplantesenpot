@@ -12,22 +12,28 @@ public class GameState : MonoBehaviour {
         GM_NEM_WIN
     };
 	
+	static bool m_Once = false;
 	static int m_ScoreP1 = 0;
 	static int m_ScoreP2 = 0;
-	int m_NbPots = 0;
+	
+	private int m_NbPots;
+	private int m_BaseNbPots;
 
-    static bool m_Once = false;
     LightGuy m_LightGuy = null;
     Nemesis m_Nemesis = null;
     Spawner m_Spawner = null;
     E_GameState m_GameState;
-    public GameObject m_TitleScreen;
+	public GameObject m_TitleScreen;
     public GameObject m_LightScreen;
     public GameObject m_DarkScreen;
 	public GameObject m_MenuMusic;
 	public GameObject m_NemesisVictoryMusic;
 	public GameObject m_LightGuyVictoryMusic;
 	public Text	      m_ScoreText;
+	public int	      m_TargetScore = 12;
+	public int 		  m_KillLightGuyScore = 3;
+	public int[]	  m_PotScores;
+
 
 	// Use this for initialization
 	void Start () {
@@ -39,13 +45,16 @@ public class GameState : MonoBehaviour {
         }
         else
 		{
-			if (m_ScoreP1 >= 12 || m_ScoreP2 >= 12)
+			if (m_ScoreP1 >= m_TargetScore || m_ScoreP2 >= m_TargetScore)
 			{
 				m_ScoreP1 = m_ScoreP2 = 0;
 			}
 	        SetGameState(E_GameState.GM_PLAY);
 		}
 		UpdateScore();
+
+		//retrieve number of flower pots in arena
+		m_BaseNbPots = m_NbPots = m_Spawner.m_NbPotDeFleurs;
 	}
 	
     void SetGameState(E_GameState state)
@@ -104,22 +113,17 @@ public class GameState : MonoBehaviour {
 				int currentNbPots = potsdeFleur.Length;
 				if (currentNbPots < m_NbPots)
 				{
-					if (currentNbPots >= 2)
-						m_ScoreP1 += 1;
-					else if (currentNbPots >= 1)
-						m_ScoreP1 += 2;
-					else
-						m_ScoreP1 += 3;
+					m_NbPots = currentNbPots;
+					m_ScoreP1 += m_PotScores[m_BaseNbPots-1-m_NbPots];
 					UpdateScore();
 				}
-				m_NbPots = currentNbPots;
-				if (m_LightGuy.IsDead())
+				if (m_LightGuy.IsDead() || m_ScoreP2 >= m_TargetScore)
 				{
 					SetGameState(E_GameState.GM_NEM_WIN);
-					m_ScoreP2 += 3;
+					m_ScoreP2 += m_KillLightGuyScore;
 					UpdateScore();
 				}
-				else if (potsdeFleur.Length == 0)				
+				else if (potsdeFleur.Length == 0 || m_ScoreP1 >= m_TargetScore)
 					SetGameState(E_GameState.GM_LIGHT_WIN);
 				break;
             case E_GameState.GM_LIGHT_WIN:
