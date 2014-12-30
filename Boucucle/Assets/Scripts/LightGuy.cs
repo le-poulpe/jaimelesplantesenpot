@@ -326,7 +326,7 @@ public class LightGuy : MonoBehaviour {
             }
             if (collidesLadder && !m_IsOnLadder)
             {
-                if (m_AxisValueY < -0.5 && Mathf.Abs(m_AxisValueX) < 0.5 && !m_IsBlasting && !m_IsShooting)
+                if (m_AxisValueY < -0.5 && Mathf.Abs(m_AxisValueX) < 0.5)
                 {
                     //up near a ladder : get on ladder
                     m_IsOnLadder = true;
