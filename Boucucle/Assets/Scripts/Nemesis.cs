@@ -178,6 +178,14 @@ public class Nemesis : MonoBehaviour {
 			float axisValueY = Input.GetAxis("VerticalP2Joy");
 			if (axisValueY == 0)
 				axisValueY = Input.GetAxis("VerticalP2Keyboard");
+			
+			
+			if (Mathf.Abs(axisValueX) == Mathf.Abs(axisValueY) && Mathf.Abs(axisValueX) == 1)
+			{
+				// got keyboard input : normalize it
+				axisValueX *= 0.70710678118654752440084436210485f;
+				axisValueY *= 0.70710678118654752440084436210485f;
+			}
 
 			bool rush = Input.GetAxis("BlastP2Joy") < 0 || Input.GetAxis("BlastP2Keyboard") < 0;
 			bool sneak = Input.GetAxis("SneakP2Joy") > 0 || Input.GetAxis("SneakP2Keyboard") < 0;

@@ -265,6 +265,13 @@ public class LightGuy : MonoBehaviour {
 		m_AxisValueY = Input.GetAxis("VerticalP1Joy");
 		if (m_AxisValueY == 0)
 			m_AxisValueY = Input.GetAxis("VerticalP1Keyboard");
+
+		if (Mathf.Abs(m_AxisValueX) == Mathf.Abs(m_AxisValueY) && Mathf.Abs(m_AxisValueX) == 1)
+		{
+			// got keyboard input : normalize it
+			m_AxisValueX *= 0.70710678118654752440084436210485f;
+			m_AxisValueY *= 0.70710678118654752440084436210485f;
+		}
 		
 		bool jumpJoy = Input.GetKeyDown(KeyCode.Joystick1Button0);
 		bool jumpKey = Input.GetKeyDown("space");
